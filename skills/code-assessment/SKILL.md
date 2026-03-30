@@ -20,7 +20,7 @@ Analyze source code at `$ARGUMENTS` (default: cwd). Generate two bilingual (EN/T
 
 NEVER read: `node_modules/`, `vendor/`, `.git/`, `dist/`, `build/`, `out/`, `.next/`, `.angular/`, `coverage/`, `*.min.js`, `*.min.css`, `*.map`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `poetry.lock`, `Pipfile.lock`, `Gemfile.lock`, `go.sum`, `.env*`, binary files, `__pycache__/`, `*.pb.go`, `*.generated.*`
 
-ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Pipfile`, `Cargo.toml`, `pom.xml`, `build.gradle`, `*.csproj`, `Gemfile`), source code (`.go`, `.ts`, `.js`, `.py`, `.cs`, `.rb`), configs (`tsconfig.json`, `angular.json`, `Dockerfile`, `nuget.config`), entry points (`main.go`, `main.ts`, `index.ts`, `Program.cs`, `Startup.cs`), CI/CD configs (`.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml`, `.circleci/config.yml`, `azure-pipelines.yml`, `bitbucket-pipelines.yml`, `.drone.yml`, `cloudbuild.yaml`).
+ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Pipfile`, `Cargo.toml`, `pom.xml`, `build.gradle`, `*.csproj`, `Gemfile`), source code (`.go`, `.ts`, `.js`, `.py`, `.rs`, `.cs`, `.rb`), configs (`tsconfig.json`, `angular.json`, `Dockerfile`, `nuget.config`), entry points (`main.go`, `main.ts`, `index.ts`, `Program.cs`, `Startup.cs`, `main.rs`, `lib.rs`), CI/CD configs (`.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml`, `.circleci/config.yml`, `azure-pipelines.yml`, `bitbucket-pipelines.yml`, `.drone.yml`, `cloudbuild.yaml`).
 
 ---
 
