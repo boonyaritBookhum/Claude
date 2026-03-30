@@ -1,6 +1,6 @@
 ---
 name: code-assessment
-description: "Generate two bilingual (EN/TH) HTML reports for a software project: (1) Dependency Analysis — CVE scanning, version audit, upgrade commands, (2) Technical Assessment — code quality grades, architecture, OWASP Top 10 (2025), CI/CD maturity, OWASP CI/CD Security Risks, action plan. Trigger for: audit, assess, scan dependencies, check CVEs, code review, technical debt, OWASP, CI/CD audit, pipeline security, supply chain. Works with Go, TypeScript, Angular, Node.js, Python, Java, Rust."
+description: "Generate two bilingual (EN/TH) HTML reports for a software project: (1) Dependency Analysis — CVE scanning, version audit, upgrade commands, (2) Technical Assessment — code quality grades, architecture, OWASP Top 10 (2025), CI/CD maturity, OWASP CI/CD Security Risks, action plan. Trigger for: audit, assess, scan dependencies, check CVEs, code review, technical debt, OWASP, CI/CD audit, pipeline security, supply chain. Works with Go, TypeScript, Angular, Node.js, Python, Java, Rust, .NET/C#, Ruby."
 argument-hint: "[project-path or leave empty for current directory]"
 ---
 
@@ -18,15 +18,15 @@ Analyze source code at `$ARGUMENTS` (default: cwd). Generate two bilingual (EN/T
 
 ## Files to SKIP (save tokens)
 
-NEVER read: `node_modules/`, `vendor/`, `.git/`, `dist/`, `build/`, `out/`, `.next/`, `.angular/`, `coverage/`, `*.min.js`, `*.min.css`, `*.map`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `go.sum`, `.env*`, binary files, `__pycache__/`, `*.pb.go`, `*.generated.*`
+NEVER read: `node_modules/`, `vendor/`, `.git/`, `dist/`, `build/`, `out/`, `.next/`, `.angular/`, `coverage/`, `*.min.js`, `*.min.css`, `*.map`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `poetry.lock`, `Pipfile.lock`, `Gemfile.lock`, `go.sum`, `.env*`, binary files, `__pycache__/`, `*.pb.go`, `*.generated.*`
 
-ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`), source code (`.go`, `.ts`, `.js`, `.py`), configs (`tsconfig.json`, `angular.json`, `Dockerfile`), entry points (`main.go`, `main.ts`, `index.ts`), CI/CD configs (`.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml`, `.circleci/config.yml`, `azure-pipelines.yml`, `bitbucket-pipelines.yml`, `.drone.yml`, `cloudbuild.yaml`).
+ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Pipfile`, `Cargo.toml`, `pom.xml`, `build.gradle`, `*.csproj`, `Gemfile`), source code (`.go`, `.ts`, `.js`, `.py`, `.cs`, `.rb`), configs (`tsconfig.json`, `angular.json`, `Dockerfile`, `nuget.config`), entry points (`main.go`, `main.ts`, `index.ts`, `Program.cs`, `Startup.cs`), CI/CD configs (`.github/workflows/*.yml`, `Jenkinsfile`, `.gitlab-ci.yml`, `.circleci/config.yml`, `azure-pipelines.yml`, `bitbucket-pipelines.yml`, `.drone.yml`, `cloudbuild.yaml`).
 
 ---
 
 ## Phase 1: Discover & Analyze
 
-**1a.** Find manifests (`go.mod`, `package.json`, `requirements.txt`, `Cargo.toml`, `pom.xml`). Identify subprojects. **Cap at 10 subprojects** — if more exist, prioritize: (1) those named `api`, `server`, `backend`, `core`, `app`, (2) subprojects with the most source files. Inform the user which were skipped.
+**1a.** Find manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Pipfile`, `Cargo.toml`, `pom.xml`, `build.gradle`, `*.csproj`, `Gemfile`). Identify subprojects. **Cap at 10 subprojects** — if more exist, prioritize: (1) those named `api`, `server`, `backend`, `core`, `app`, (2) subprojects with the most source files. Inform the user which were skipped.
 - If **no manifests found at all**, tell the user "No supported project manifests found in `<path>`" and stop.
 
 > **Run 1b, 1c, 1d, and 1e in parallel** — launch all four as simultaneous agents once manifests and file lists are identified. Do not wait for one to finish before starting the next.
@@ -42,12 +42,15 @@ ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`), source code
   - Node.js/yarn: `yarn add pkg@ver` / Node.js/pnpm: `pnpm add pkg@ver`
   - Python/pip: `pip install pkg==ver`
   - Python/poetry: `poetry add pkg@ver`
+  - Python/uv: `uv add pkg==ver`
   - Rust: edit `Cargo.toml` version then `cargo update -p pkg`
   - Java/Maven: `mvn versions:use-dep-version -Dincludes=group:artifact -DdepVersion=ver`
   - Java/Gradle: edit `build.gradle` dependency version
+  - .NET/C#: `dotnet add package pkg --version ver`
+  - Ruby/Bundler: edit `Gemfile` version then `bundle update pkg`
 
 **1c. Code quality** (parallel agents):
-- **Cap at 40 source files per subproject.** Read in priority order: (1) entry points (`main.*`, `index.*`, `app.*`, `server.*`), (2) routers/controllers, (3) auth/security middleware, (4) database/ORM models, (5) utility/helper functions, (6) test files (sample only — 3 max). Stop once 40 files are read.
+- **Cap at 40 source files per subproject.** Read in priority order: (1) entry points (`main.*`, `index.*`, `app.*`, `server.*`, `Program.cs`, `Startup.cs`), (2) routers/controllers, (3) auth/security middleware, (4) database/ORM models, (5) utility/helper functions, (6) test files (sample only — 3 max). Stop once 40 files are read.
 - Scan for: architecture, tests, security (secrets, XSS, CORS, injection, unbounded reads, leaks, missing timeouts/shutdown), performance, stability. Grade A+ to F.
 
 **1d. OWASP Top 10 (2025) audit** (parallel agent):
@@ -87,7 +90,7 @@ Create both HTML files in `$ARGUMENTS` (or cwd).
 - Only report CVEs verified via web search — never fabricate CVE IDs
 - Thai: natural Thai, keep technical terms (CVE, DoS, XSS) in English
 - Reports link to each other via relative filename
-- Self-contained HTML — CSS inline in `<style>`, only JS is `switchLang()`
+- Self-contained HTML — CSS inline in `<style>`, no external JS dependencies (only inline scripts)
 - Severity: Critical=patch before deploy, High=this sprint, Medium=plan, Low=nice-to-have
 
 ## Completion

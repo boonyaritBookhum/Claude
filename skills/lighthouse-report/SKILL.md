@@ -15,7 +15,6 @@ Read all Lighthouse HTML report files from `$ARGUMENTS` (default: `lighthouse-re
 - If `$ARGUMENTS` is provided, verify the directory exists. If not, tell the user and stop.
 - If `$ARGUMENTS` is empty, look for `lighthouse-report/` in cwd. If it does not exist either, ask the user to provide the directory path and stop.
 - If `lighthouse-summary-report.html` already exists in the target directory, inform the user it will be overwritten and proceed.
-- If no HTML files found in target directory → tell the user "No Lighthouse report files found in `<path>`" and stop.
 
 ## Step 1: Discover report files
 
@@ -39,10 +38,16 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 - URL — `"requestedUrl"` or `"finalUrl"` in embedded JSON
 - Category scores — Performance, Accessibility, Best Practices, SEO
   - Raw value from `"score"` field is **0.0–1.0**. Multiply by 100 to get the 0–100 display score. Round to nearest integer.
-- Core Web Vitals — extract from `"numericValue"` and `"displayValue"`:
-  - **FCP, LCP, TTI, Speed Index** — `numericValue` is in **milliseconds**; divide by 1000 for seconds display. Use `displayValue` as-is when available.
-  - **TBT** — `numericValue` is in **milliseconds**; display as ms.
-  - **CLS** — `numericValue` is dimensionless (no unit); display as a decimal (e.g. `0.25`).
+- **Core Web Vitals** (LCP, CLS, INP — these 3 define the green/orange/red pass/fail badges in the report):
+  - **LCP** — audit key `"largest-contentful-paint"`; `numericValue` ms → divide by 1000 for seconds. Thresholds: ≤2.5s Good, ≤4.0s Needs Work, >4.0s Poor.
+  - **CLS** — audit key `"cumulative-layout-shift"`; `numericValue` is dimensionless. Thresholds: ≤0.1 Good, ≤0.25 Needs Work, >0.25 Poor.
+  - **INP** — audit key `"interaction-to-next-paint"`; `numericValue` ms. Thresholds: ≤200ms Good, ≤500ms Needs Work, >500ms Poor. Present in Lighthouse v10+ only; skip gracefully if absent.
+- **Lab metrics** (diagnostic, not CWV — displayed as supplementary data):
+  - **FCP** — audit key `"first-contentful-paint"`; `numericValue` ms → seconds. Thresholds: ≤1.8s Good, ≤3.0s Needs Work, >3.0s Poor.
+  - **TBT** — audit key `"total-blocking-time"`; `numericValue` ms. Thresholds: ≤200ms Good, ≤600ms Needs Work, >600ms Poor.
+  - **TTI** — audit key `"interactive"`; `numericValue` ms → seconds.
+  - **Speed Index** — audit key `"speed-index"`; `numericValue` ms → seconds.
+  - Use `displayValue` as-is when available for all metrics above.
 - Top audit failures — opportunities with potential savings
 - Diagnostics — main-thread work, JS execution time, unused JS size, network payload
 

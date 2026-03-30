@@ -99,12 +99,22 @@ document.addEventListener('DOMContentLoaded', () => {
 Embed page data as JS array:
 ```javascript
 const pages = [
-  { name: 'page-name', perf: 30, fcp: 2.2, lcp: 4.5, tbt: 640, cls: 0.300, si: 7.5, mt: 3.0, js: 1.5, unusedJS: 2678, payload: 6069 },
+  { name: 'page-name', perf: 30, fcp: 2.2, lcp: 4.5, inp: 320, tbt: 640, cls: 0.300, tti: 5.1, si: 7.5, mt: 3.0, js: 1.5, unusedJS: 2678, payload: 6069 },
+  // fcp/lcp/tti/si = seconds | tbt/inp = ms | cls = unitless | mt/js = seconds | unusedJS/payload = KiB
+  // inp: null if Lighthouse < v10 | tti: may be absent in newer Lighthouse versions
   // ... sorted by perf ascending
 ];
 ```
 
-**scoreColor helper:**
+**Color helpers** — use these when coloring individual metric values in charts and tables:
 ```javascript
+// For Lighthouse category scores (0–100)
 function scoreColor(v) { return v >= 90 ? '#0cce6b' : v >= 50 ? '#ffa400' : '#ff4e42'; }
+
+// For individual metrics — pass numericValue as stored in pages[]
+function lcpColor(s)  { return s <= 2.5  ? '#0cce6b' : s <= 4.0  ? '#ffa400' : '#ff4e42'; } // seconds
+function fcpColor(s)  { return s <= 1.8  ? '#0cce6b' : s <= 3.0  ? '#ffa400' : '#ff4e42'; } // seconds
+function tbtColor(ms) { return ms <= 200 ? '#0cce6b' : ms <= 600 ? '#ffa400' : '#ff4e42'; } // ms
+function clsColor(v)  { return v <= 0.1  ? '#0cce6b' : v <= 0.25 ? '#ffa400' : '#ff4e42'; } // unitless
+function inpColor(ms) { return ms == null ? '#94a3b8' : ms <= 200 ? '#0cce6b' : ms <= 500 ? '#ffa400' : '#ff4e42'; } // ms; null (Lighthouse <v10) → gray
 ```
