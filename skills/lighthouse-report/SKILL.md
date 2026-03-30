@@ -27,6 +27,13 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 ## Step 2: Extract data (single pass, parallel agents)
 
+> **Token efficiency:** Lighthouse HTML files are 2–5 MB of HTML/CSS/JS. Do NOT read the full file.
+> Extract only the embedded JSON data blob:
+> - Search for `window.__LIGHTHOUSE_JSON__` — its value is the full report JSON object
+> - Or look for `<script type="application/json">` near the end of the file
+> - Extract that JSON blob only. Skip all HTML markup, CSS, SVG, and other script tags.
+> - This reduces token cost by **10–50× per file**.
+
 **Batching:** 1–8 files → 1 agent. 9–16 → 2 agents (8 each). 17+ → ceil(N/8) agents, last batch takes the remainder. Each agent reads its assigned files and extracts ALL data in one pass:
 
 **Basic metrics:**

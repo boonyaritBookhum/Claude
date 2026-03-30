@@ -24,12 +24,14 @@ ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`), source code
 
 **1b. Dependency analysis** (parallel agents per subproject):
 - Extract deps + versions from manifests only
-- Web search `"<pkg> latest version"` and `"<pkg> CVE vulnerability"` per significant dep
+- **Skip** pure dev/tooling deps: `eslint`, `prettier`, `jest`, `mocha`, `@types/*`, `webpack`, `babel`, `typescript`, `husky`, `lint-staged`
+- Web search `"<pkg> latest version"` and `"<pkg> CVE vulnerability"` per significant dep — **cap at 30 deps per subproject**; if more, prioritize: (1) runtime/direct deps, (2) deps with known vulnerability history (e.g. `express`, `axios`, `django`, `spring`), (3) largest version gaps
 - Risk levels: CRITICAL (exploit CVE) → HIGH (DoS CVE, deprecated, EOL) → MEDIUM (many versions behind) → LOW (1-2 patches) → OK
 - Generate upgrade commands: `go get pkg@ver`, `npm install pkg@ver`, etc.
 
 **1c. Code quality** (parallel agents):
-Scan source for: architecture, tests, security (secrets, XSS, CORS, injection, unbounded reads, leaks, missing timeouts/shutdown), performance, stability. Grade A+ to F.
+- **Cap at 40 source files per subproject.** Read in priority order: (1) entry points (`main.*`, `index.*`, `app.*`, `server.*`), (2) routers/controllers, (3) auth/security middleware, (4) database/ORM models, (5) utility/helper functions, (6) test files (sample only — 3 max). Stop once 40 files are read.
+- Scan for: architecture, tests, security (secrets, XSS, CORS, injection, unbounded reads, leaks, missing timeouts/shutdown), performance, stability. Grade A+ to F.
 
 **1d. OWASP Top 10 (2025) audit** (parallel agent):
 Systematically check code against all 10 categories (2025 edition):
@@ -82,7 +84,7 @@ For each CICD-SEC risk: rate as PASS / WARN / FAIL with evidence. Generate overa
 
 **When ready to generate**, read these reference files:
 - `references/styles.css` — paste into `<style>` tag of both reports
-- Use the HTML component patterns below
+- `references/components.md` — HTML component patterns (deferred: read only when starting to generate HTML)
 
 ### Shared JS (bottom of both reports)
 ```html
@@ -95,39 +97,6 @@ function switchLang(lang,btn){
 }
 </script>
 ```
-
-### Component Cheat Sheet
-
-**Cover (tech):** `div.cover > div.wrapper > div.top-row(logo-row + report-link) + h1(span=accent) + div.subtitle + div.meta-row(meta-item*)`
-**Cover (dep):** `div.cover > div.wrapper > div.logo-row + h1(span=accent) + div.subtitle + div.meta-row(meta-item*)` (no .top-row)
-**Lang toggle:** `div.lang-tabs > button.lang-tab.active[onclick=switchLang('en',this)]` + `button.lang-tab[onclick=switchLang('th',this)]`
-**Sections:** `div#lang-en.lang-section.active` (EN) + `div#lang-th.lang-section` (TH)
-**Section header:** `div.section > div.section-title > div.icon + text`
-**Alert:** `div.alert.alert-critical|alert-high|alert-info`
-**Callout:** `div.callout.callout-success|callout-warn|callout-danger|callout-info`
-**Score cards (counts):** `div.summary-grid > div.scard.scard-critical|high|medium|low|ok > div.num + div.lbl`
-**Score cards (grades):** `div.score-grid > div.score-card > div.val(B+) + div.lbl`
-**CVE count cards:** `div.cve-grid > div.cve-card.cc-critical|high|medium|low|ok > div.num + div.lbl`
-**CVE banner:** `div.cve-banner > div.icon + div > h4 + p(span.cve-pill + strong + text)`
-**Badge:** `span.badge.b-critical|b-high|b-medium|b-low|b-ok|b-eol`
-**CVE pill:** `span.cve-pill` (monospace purple)
-**Table:** `div.tbl-wrap > table > thead(th) + tbody(tr > td)` — use `.cat-row` for group headers, `.ver-old`/`.ver-new` for versions
-**Card:** `div.card > h3 + content`
-**Checklist:** `ul.checklist > li > div.ci.ci-ok|ci-warn|ci-fail + span`
-**Arch diagram:** `div.arch-box` (pre-formatted dark bg, use `.hl`=yellow `.grn`=green `.blu`=blue `.pnk`=pink `.red`=red for colored text)
-**Sub cards:** `div.sub-grid > div.sub-card > div.tag + h4 + p`
-**Upgrade cmd:** `div.upgrade-block > h4 + pre(span.cmt=comment .cmd=command .pkg=package .ver=version)`
-**Timeline:** `div.timeline > div.tl-item > div.tl-title + ul > li`
-**Report nav:** `div.report-nav > a.report-btn.active + a.report-btn`
-**OWASP grid:** `div.owasp-grid > div.owasp-item.owasp-pass|owasp-warn|owasp-fail > div.owasp-id + div.owasp-name + div.owasp-status`
-**OWASP score ring:** `div.owasp-score > div.ring > span.ring-num + small + div.ring-label`
-**CI/CD pipeline:** `div.pipeline-flow > div.pipe-stage.pipe-ok|pipe-warn|pipe-fail|pipe-na > div.pipe-icon + div.pipe-label + div.pipe-status`
-**CI/CD maturity:** `div.maturity-bar > div.maturity-fill[data-level="1-5"] + div.maturity-labels > span*5`
-**CI/CD OWASP score ring:** `div.owasp-score > div.ring > span.ring-num + small + div.ring-label` (reuse owasp-score pattern with "CI/CD Security" label)
-**CI/CD OWASP grid:** reuse `div.owasp-grid > div.owasp-item` pattern with CICD-SEC-01..10 IDs
-**Footer:** `div.footer > p + p`
-
----
 
 ### Report 1: dependency-analysis-report.html
 
