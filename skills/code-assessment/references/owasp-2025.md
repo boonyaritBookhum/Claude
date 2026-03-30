@@ -1,0 +1,14 @@
+# OWASP Top 10 (2025) Checklist
+
+Read this file when running Phase 1d of code-assessment. Check code against all 10 categories.
+
+- **A01:2025 Broken Access Control** — missing auth checks, IDOR, path traversal, CORS misconfig, privilege escalation, default-allow, SSRF (consolidated here from old A10:2021), unvalidated URLs from user input, no allowlist for outbound requests, cloud metadata access risk
+- **A02:2025 Security Misconfiguration** — default credentials, unnecessary features/ports, verbose errors in prod, missing security headers, permissive CORS, overly permissive cloud/container configs, unnecessary HTTP methods enabled, missing HSTS/CSP headers
+- **A03:2025 Software Supply Chain Failures** _(NEW in 2025)_ — unvetted third-party dependencies, missing integrity verification (no lockfile or lockfile ignored), typosquatting risk, dependency confusion, unsigned packages, no SBOM, pulling from untrusted registries, missing vulnerability scanning in dependency pipeline. Cross-reference with dependency analysis results.
+- **A04:2025 Cryptographic Failures** — weak/no encryption, hardcoded keys, weak hashing (MD5/SHA1), missing TLS, sensitive data in logs/URLs, insufficient key rotation, use of deprecated crypto algorithms, improper certificate validation
+- **A05:2025 Injection** — SQL/NoSQL/OS/LDAP injection, XSS, template injection, unsafe deserialization of user input, header injection, expression language injection, ORM injection
+- **A06:2025 Insecure Design** — missing rate limiting, no abuse-case modeling, lack of input validation patterns, missing business-logic controls, no threat modeling, missing security requirements in design, no defense-in-depth strategy
+- **A07:2025 Authentication Failures** — weak password policy, missing MFA, session fixation, credential stuffing exposure, plaintext tokens, improper session management, weak credential recovery, brute-force susceptibility
+- **A08:2025 Software or Data Integrity Failures** — unsigned updates, unverified CI/CD pipelines, unsafe deserialization, no integrity checks on artifacts, auto-update without verification, CDN/external resource integrity (missing SRI), tampered data accepted without validation
+- **A09:2025 Logging & Alerting Failures** — no audit logs, missing login/access-denied logging, no alerting on suspicious activity, logs without context (who/what/when), log injection vulnerabilities, no centralized logging, missing real-time alerting, excessive false positives masking real threats
+- **A10:2025 Mishandling of Exceptional Conditions** _(NEW in 2025)_ — unhandled exceptions exposing stack traces/internals, fail-open error handling (system grants access on error), missing error boundaries, crash-on-edge-case vulnerabilities, resource exhaustion from unhandled states, inconsistent error responses leaking info, missing circuit breakers, no graceful degradation under load

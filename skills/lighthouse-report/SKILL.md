@@ -1,14 +1,12 @@
 ---
 name: lighthouse-report
-description: "Read Lighthouse HTML report files from a directory, analyze performance/accessibility/best-practices scores and metrics, then generate a beautiful summary HTML report with charts, file-level deep-dive analysis, and code fix examples in both Thai and English. Use this skill when the user mentions Lighthouse reports, performance audits, Core Web Vitals analysis, page speed reports, or wants to aggregate multiple Lighthouse HTML files into a single summary."
+description: "Aggregate Lighthouse HTML report files from a directory and generate a bilingual (EN/TH) summary HTML report with charts, file-level deep-dive, and fix examples. Trigger when user mentions: Lighthouse reports, performance audit, Core Web Vitals, page speed, or wants to combine multiple Lighthouse HTML files."
 argument-hint: "[directory-path]"
 ---
 
 # Lighthouse Report Analyzer
 
 Read all Lighthouse HTML report files from `$ARGUMENTS` (default: `lighthouse-report/` in cwd).
-
-> **Note on paths:** `references/design.md` is located in the same directory as this skill file. Resolve its path relative to the skill file location, not the target report directory.
 
 ---
 
@@ -38,7 +36,6 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 **Basic metrics:**
 - URL — `"requestedUrl"` or `"finalUrl"` in embedded JSON
-- Lighthouse version — `"lighthouseVersion"` field (for reference only)
 - Category scores — Performance, Accessibility, Best Practices, SEO
   - Raw value from `"score"` field is **0.0–1.0**. Multiply by 100 to get the 0–100 display score. Round to nearest integer.
 - Core Web Vitals — extract from `"numericValue"` and `"displayValue"`:
@@ -77,35 +74,9 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 ## Step 4: Generate HTML report
 
-**When ready to generate**, read `references/design.md` (located in the same directory as this skill file) for CSS design system, code block patterns, code examples, Chart.js structure, and JS.
+**When ready to generate**, read `references/design.md` — located in the **same directory as this skill file** (not the report directory). It contains the CSS design system, Chart.js setup, code block patterns, code examples, and the full report section structure.
 
 Create `lighthouse-summary-report.html` in the same directory as source reports.
-
-### Report Sections (bilingual EN/TH)
-
-1. **Executive Summary** — status, pages tested, score range, avg/min/max stats grid
-2. **Understanding the Metrics** — table: FCP, LCP, TBT, CLS, Speed Index with Good/Needs Work/Poor thresholds
-3. **Scores Overview — Grouped by Menu** — pages by URL module:
-   - Colored header row: group name + avg score badge + page count
-   - Page rows indented with `&emsp;`
-   - Group summary cards at top
-   - "Full Report" column linking to original HTML files (relative paths)
-4. **Root Cause Charts** (Chart.js):
-   - Root Cause Doughnut — weighted % (Unused JS, Main-Thread, Slow LCP, CLS, Network, bfcache)
-   - Radar — avg vs "Good" threshold for 5 metrics
-   - Performance Score Bar — horizontal bars sorted low→high, threshold lines at 50/90
-   - LCP Distribution — histogram by LCP range
-   - TBT Distribution — histogram by TBT range
-   - Main-Thread Work Top 10 — stacked bars (JS Execution vs Other)
-   - Unused JS Top 10 — horizontal bars with KiB labels
-   - CLS by Page — horizontal bars, threshold lines at 0.1/0.25
-5. **Key Findings** — numbered analysis of ~7 major problems
-6. **File-Level Deep Dive** — THE MOST IMPORTANT SECTION:
-   - **A: Shared Problems** — per problematic file: name+size, stats grid (% unused, worst long task, scripting time, pages affected), "What is it" + "Why it's slow" (bilingual), green "SAFE FIX" box with numbered steps + risk level
-   - **B: Per-Page Problems** — table: Page (grouped by module), Problem File/Element, Impact (CRITICAL/HIGH/MEDIUM + metrics), Safe Fix, Risk (Zero/Low/Medium). Pages with no issues: "No page-specific fix needed"
-7. **Recommendations** — prioritized table: Priority tag, Area, Recommendation, Expected Impact
-8. **Action Plan** — 4-phase: Quick Wins → Code Optimization → Runtime Performance → Advanced
-9. **Code Examples — How to Fix** — include **only** the examples relevant to problems actually found in the data (e.g., omit CLS examples if no CLS issues were detected). See `references/design.md` for the full set of 7 available samples.
 
 ## Step 5: Confirm completion
 

@@ -3,6 +3,19 @@
 Read this file ONLY when generating HTML reports (Phase 2).
 CSS classes are defined in `references/styles.css`.
 
+## Shared JS (bottom of both reports)
+
+```html
+<script>
+function switchLang(lang,btn){
+  document.querySelectorAll('.lang-section').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.lang-tab').forEach(el=>el.classList.remove('active'));
+  document.getElementById('lang-'+lang).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+```
+
 ## Component Cheat Sheet
 
 **Cover (tech):** `div.cover > div.wrapper > div.top-row(logo-row + report-link) + h1(span=accent) + div.subtitle + div.meta-row(meta-item*)`
