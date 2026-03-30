@@ -15,6 +15,7 @@ Read all Lighthouse HTML report files from `$ARGUMENTS` (default: `lighthouse-re
 - If `$ARGUMENTS` is provided, verify the directory exists. If not, tell the user and stop.
 - If `$ARGUMENTS` is empty, look for `lighthouse-report/` in cwd. If it does not exist either, ask the user to provide the directory path and stop.
 - If `lighthouse-summary-report.html` already exists in the target directory, inform the user it will be overwritten and proceed.
+- If no HTML files found in target directory → tell the user "No Lighthouse report files found in `<path>`" and stop.
 
 ## Step 1: Discover report files
 
@@ -74,7 +75,10 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 ## Step 4: Generate HTML report
 
-**When ready to generate**, read `references/design.md` — located in the **same directory as this skill file** (not the report directory). It contains the CSS design system, Chart.js setup, code block patterns, code examples, and the full report section structure.
+**When ready to generate**, read these reference files (in order) — located in the **same directory as this skill file** (not the report directory):
+- `references/styles.css` — paste into `<style>` tag
+- `references/components.md` — HTML component patterns, Chart.js setup, shared JS
+- `references/report-structure.md` — full section structure and code example list
 
 Create `lighthouse-summary-report.html` in the same directory as source reports.
 

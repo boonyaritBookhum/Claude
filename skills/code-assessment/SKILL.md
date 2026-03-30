@@ -14,6 +14,7 @@ Analyze source code at `$ARGUMENTS` (default: cwd). Generate two bilingual (EN/T
 
 - If `$ARGUMENTS` is provided, verify the path exists. If not, tell the user and stop.
 - If `$ARGUMENTS` is empty, use cwd.
+- If `dependency-analysis-report.html` or `technical-assessment-report.html` already exist in the target directory, inform the user they will be overwritten and proceed.
 
 ## Files to SKIP (save tokens)
 
@@ -72,6 +73,12 @@ For each CICD-SEC risk: rate as PASS / WARN / FAIL with evidence. Generate overa
 - `references/report-structure.md` — full section structure for both reports
 
 Create both HTML files in `$ARGUMENTS` (or cwd).
+
+**Conditional sections:** Skip or collapse sections with no data:
+- No CVEs found → show "No known CVEs detected" callout instead of empty CVE table
+- No CI/CD config found → show "No CI/CD pipeline detected" alert, skip pipeline-flow diagram, set maturity to Beginner
+- No code-level security findings → show success callout instead of empty issues table
+- Zero OWASP failures → show congratulatory callout instead of detailed failure list
 
 ---
 
