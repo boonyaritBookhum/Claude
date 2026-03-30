@@ -8,25 +8,41 @@ argument-hint: "[directory-path]"
 
 Read all Lighthouse HTML report files from `$ARGUMENTS` (default: `lighthouse-report/` in cwd).
 
+> **Note on paths:** `references/design.md` is located in the same directory as this skill file. Resolve its path relative to the skill file location, not the target report directory.
+
 ---
+
+## Step 0: Validate input
+
+- If `$ARGUMENTS` is provided, verify the directory exists. If not, tell the user and stop.
+- If `$ARGUMENTS` is empty, look for `lighthouse-report/` in cwd. If it does not exist either, ask the user to provide the directory path and stop.
+- If `lighthouse-summary-report.html` already exists in the target directory, inform the user it will be overwritten and proceed.
 
 ## Step 1: Discover report files
 
 Glob `*.html` in target directory (exclude any existing `lighthouse-summary-report.html`).
 
-## Step 2: Extract data (single pass, parallel agents ~8 files each)
+- If **0 HTML files** found → tell the user "No Lighthouse report files found in `<path>`" and stop.
+- If any file fails to parse or does not contain Lighthouse embedded JSON, **skip it**, note it by name, and continue with the rest.
 
-Launch parallel agents (subagent_type `general-purpose`). Each agent reads assigned files and extracts ALL data in one pass:
+## Step 2: Extract data (single pass, parallel agents)
+
+**Batching:** 1–8 files → 1 agent. 9–16 → 2 agents (8 each). 17+ → ceil(N/8) agents, last batch takes the remainder. Each agent reads its assigned files and extracts ALL data in one pass:
 
 **Basic metrics:**
 - URL — `"requestedUrl"` or `"finalUrl"` in embedded JSON
-- Category scores — Performance, Accessibility, Best Practices, SEO (`"score"` near category names)
-- Core Web Vitals — FCP, LCP, TBT, CLS, Speed Index, TTI (`"numericValue"`, `"displayValue"`)
+- Lighthouse version — `"lighthouseVersion"` field (for reference only)
+- Category scores — Performance, Accessibility, Best Practices, SEO
+  - Raw value from `"score"` field is **0.0–1.0**. Multiply by 100 to get the 0–100 display score. Round to nearest integer.
+- Core Web Vitals — extract from `"numericValue"` and `"displayValue"`:
+  - **FCP, LCP, TTI, Speed Index** — `numericValue` is in **milliseconds**; divide by 1000 for seconds display. Use `displayValue` as-is when available.
+  - **TBT** — `numericValue` is in **milliseconds**; display as ms.
+  - **CLS** — `numericValue` is dimensionless (no unit); display as a decimal (e.g. `0.25`).
 - Top audit failures — opportunities with potential savings
 - Diagnostics — main-thread work, JS execution time, unused JS size, network payload
 
 **File-level detail (same pass):**
-- Unused JS — `"reduce-unused-javascript"` / `"unused-javascript"`: file URL, totalBytes, wastedBytes
+- Unused JS — try `"unused-javascript"` first (Lighthouse ≥ v9); fall back to `"reduce-unused-javascript"` (v8 and earlier): file URL, totalBytes, wastedBytes
 - Unused CSS — `"unused-css-rules"`: file URLs, wasted bytes
 - Render-blocking — `"render-blocking-resources"` items
 - Third-party code — `"third-party-summary"` with transfer sizes
@@ -41,17 +57,20 @@ Launch parallel agents (subagent_type `general-purpose`). Each agent reads assig
 
 ## Step 3: Analyze and group
 
-1. **Group by URL path module** — e.g., `/well-database/*`, `/admin-setting/*`. Compute avg score per group.
+1. **Group by URL path module** — use the first path segment (e.g., `/well-database/*`, `/admin-setting/*`).
+   - If a URL has no meaningful path segment (e.g., `/`, `/about`, `/contact`), assign it to a group called **"Root / Single Pages"**.
+   - If ALL URLs fall into root paths, skip grouping and treat the entire set as one group.
+   - Compute avg score per group.
 2. **Shared problems** — files on ALL pages (shared bundle, polyfills, external scripts, fonts). Highest priority.
 3. **Per-page problems** — unique to specific pages (large DOM, CLS elements, page-specific chunks).
 4. **Fix safety classification:**
    - **Zero risk**: preload hints, preconnect, image format, font-display: swap, CSS min-height
    - **Low risk**: async/defer scripts, removing unused CSS links, lazy-loading routes
-   - **Medium risk**: code splitting, removing polyfills, zoneless Angular, SSR
+   - **Medium risk**: code splitting, removing polyfills, SSR, framework-specific optimizations (e.g., zoneless Angular, React Server Components, Vue async components)
 
 ## Step 4: Generate HTML report
 
-**When ready to generate**, read `references/design.md` for CSS design system, code block patterns, code examples, Chart.js structure, and JS.
+**When ready to generate**, read `references/design.md` (located in the same directory as this skill file) for CSS design system, code block patterns, code examples, Chart.js structure, and JS.
 
 Create `lighthouse-summary-report.html` in the same directory as source reports.
 
@@ -79,8 +98,14 @@ Create `lighthouse-summary-report.html` in the same directory as source reports.
    - **B: Per-Page Problems** — table: Page (grouped by module), Problem File/Element, Impact (CRITICAL/HIGH/MEDIUM + metrics), Safe Fix, Risk (Zero/Low/Medium). Pages with no issues: "No page-specific fix needed"
 7. **Recommendations** — prioritized table: Priority tag, Area, Recommendation, Expected Impact
 8. **Action Plan** — 4-phase: Quick Wins → Code Optimization → Runtime Performance → Advanced
-9. **Code Examples — How to Fix** — 7 before/after code samples (see `references/design.md`)
+9. **Code Examples — How to Fix** — include **only** the examples relevant to problems actually found in the data (e.g., omit CLS examples if no CLS issues were detected). See `references/design.md` for the full set of 7 available samples.
 
 ## Step 5: Confirm completion
 
-Tell user: file path, files analyzed, module groupings with avg scores (table), top 3 shared issues, top 3 per-page issues, risk level summary (Zero/Low/Medium counts).
+Tell user:
+- Output file path
+- Files analyzed (and any skipped files with reason)
+- Module groupings with avg scores (table)
+- Top 3 shared issues
+- Top 3 per-page issues
+- Risk level summary (Zero/Low/Medium counts)
