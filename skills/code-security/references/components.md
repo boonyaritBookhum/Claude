@@ -64,8 +64,11 @@ document.addEventListener('DOMContentLoaded',()=>{
   Fill color per level: Critical `#dc2626`, High `#ea580c`, Medium `#ca8a04`, Low `#16a34a`
 **Callout:** `div.callout.callout-success|warn|danger|info`
 **Table:** `div.tbl-wrap > table > thead(th) + tbody(tr > td)` — location in `span.loc`
-**Coverage grid:** `div.coverage-grid > div.cov-item.cov-clean|warn|critical > span(icon) + span(name) + span.cov-count`
+**Coverage grid:** `div.coverage-grid > div.cov-item.cov-clean|warn|critical > div.cov-head(div.cov-icon(emoji) + span.cov-name) + div.cov-status("✅ Clean"|"⚠️ N issues"|"🔴 N issues")`
 **Secret value:** `span.secret-val` — e.g. `AKIA****WXYZ` (mask middle chars)
+**File stats:** `div.file-stats > span(strong=N + " files scanned") + span(strong=N + " with findings") + span(strong=N + " clean")`
+**File index:** `div.file-index > div.file-group > div.file-group-title("Files with Findings"|"Clean Files") + div.file-item.file-hit|file-warn|file-clean > span.file-icon(🔴|🟡|✅) + span.file-path(path/to/file.go) + span.file-count("3 findings"|"Clean")`
+  — Group files: `.file-hit` = has CRITICAL/HIGH, `.file-warn` = has MEDIUM/LOW only, `.file-clean` = no findings. Sort by finding count desc.
 **Timeline:** `div.timeline > div.tl-item > div.tl-title + ul > li`
 **Footer:** `div.footer > p + p`
 

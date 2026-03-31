@@ -41,7 +41,12 @@ Structure (EN section, repeat in TH with Thai text):
    - Action box `callout-danger`: rotate all exposed secrets immediately, add patterns to `.gitignore`, migrate to secrets manager (Vault/AWS Secrets Manager/GitHub Secrets)
    - If no secrets found: `callout-success`
 
-7. **Security Coverage Map** — `div.coverage-grid` (10 cells):
+7. **Files Scanned** — file-stats (total / with findings / clean) + file-index:
+   - Group 1 "Files with Findings": `.file-hit` (CRITICAL/HIGH) and `.file-warn` (MEDIUM/LOW only) — show file path + finding count badge, sorted by count desc
+   - Group 2 "Clean Files": `.file-clean` — show file path + "Clean" badge
+   - Each file path links to its first finding (anchor `#file-N`) — use `file-icon` 🔴 for CRITICAL/HIGH, 🟡 for MEDIUM/LOW, ✅ for clean
+
+8. **Security Coverage Map** — `div.coverage-grid` (10 cells):
    - Secrets & Credentials
    - SQL / NoSQL Injection
    - XSS & Template Injection
@@ -52,13 +57,14 @@ Structure (EN section, repeat in TH with Thai text):
    - Sensitive Data Exposure
    - Security Misconfiguration
    - Insecure Deserialization
-   - Each cell: `.cov-clean` (✅ Clean) / `.cov-warn` (⚠️ N issues) / `.cov-critical` (🔴 N issues)
+   - Each cell: `.cov-clean` (icon + name + "✅ Clean") / `.cov-warn` (icon + name + "⚠️ N issues") / `.cov-critical` (icon + name + "🔴 N issues")
+   - Icons per category: 🔑 Secrets, 💉 SQL Injection, 🖥️ XSS, ⌨️ OS Command, 📂 Path Traversal, 🔒 Auth, 🔐 Crypto, 📋 Data Exposure, ⚙️ Misconfig, 📦 Deserialization
 
-8. **Remediation Roadmap** — `div.timeline` (4 items):
+9. **Remediation Roadmap** — `div.timeline` (4 items):
    - 🔴 **Immediate (Today)**: rotate exposed secrets, fix CRITICAL injection flaws, add missing auth on exposed endpoints
    - 🟠 **Sprint 1**: fix HIGH auth/IDOR issues, add input validation/parameterized queries, fix JWT issues
    - 🟡 **Sprint 2–3**: address MEDIUM findings, add security headers, improve crypto, fix path traversal
    - 🟢 **Backlog**: LOW/INFO hardening, SAST integration in CI/CD, dependency scanning, security testing
 
-Thai section titles: สรุปผู้บริหาร, ช่องโหว่ระดับวิกฤตและสูง, ช่องโหว่ระดับปานกลาง, ช่องโหว่ระดับต่ำ, ข้อมูลลับและ Credential, แผนที่การตรวจสอบ, แผนการแก้ไข
+Thai section titles: สรุปผู้บริหาร, ช่องโหว่ระดับวิกฤตและสูง, ช่องโหว่ระดับปานกลาง, ช่องโหว่ระดับต่ำ, ข้อมูลลับและ Credential, ไฟล์ที่ตรวจสอบ, แผนที่การตรวจสอบ, แผนการแก้ไข
 Thai roadmap labels: ดำเนินการทันที (วันนี้), Sprint 1 (1–2 สัปดาห์), Sprint 2–3 (1 เดือน), Backlog (ระยะยาว)
