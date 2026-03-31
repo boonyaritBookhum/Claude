@@ -34,7 +34,7 @@ Structure (EN section, repeat in TH):
 6. **Code Quality Strengths** — card per subproject with checklist (ci-ok/ci-warn)
 7. **CVE Table** — columns: CVE(.cve-pill), Package, Project, Vulnerable Ver(red), Fixed Ver(green), Impact
 8. **Code Issues** — columns: #, Severity(.badge), Location(code+small), Issue & Fix(strong+em)
-9. **OWASP Top 10 (2025) Compliance** — owasp-score ring (X/10 categories passed) + owasp-grid (A01–A10:2025, each with PASS/WARN/FAIL status) + expandable findings per category with file:line evidence + callout linking to https://owasp.org/Top10/2025/ + note changes from 2021 (A03 Supply Chain & A10 Exceptional Conditions are new)
+9. **OWASP Top 10 (2025) Compliance** — owasp-score ring (X/10 categories passed) + owasp-grid (A01–A10:2025, each with PASS/WARN/FAIL status + owasp-detail text showing file:line evidence) + callout linking to https://owasp.org/Top10/2025/ + note changes from 2021 (A03 Supply Chain & A10 Exceptional Conditions are new)
 10. **CI/CD Pipeline Assessment** — maturity-bar (Beginner→Expert) + pipeline-flow diagram (Source→Build→Test→Security→Deploy stages) + detailed table: Area, Status(✅/⚠️/❌/➖), Current State, Recommendation + callout for top 3 CI/CD improvements
 11. **OWASP Top 10 CI/CD Security Risks** — cicd-owasp-score ring (X/10 risks passed) + owasp-grid (CICD-SEC-01 to CICD-SEC-10, each with PASS/WARN/FAIL status and evidence) + detailed table: Risk ID, Risk Name, Status, Finding, Recommendation + callout linking to https://owasp.org/www-project-top-10-ci-cd-security-risks/
 12. **Dependency Health** — cross-project comparison table + callout-warn linking to dep report

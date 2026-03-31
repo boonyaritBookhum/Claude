@@ -80,6 +80,7 @@ function switchLang(lang,btn){
 **CVE count cards:** `div.cve-grid > div.cve-card.cc-critical|high|medium|low|ok > div.num + div.lbl`
 **CVE banner:** `div.cve-banner > div.icon + div > h4 + p(span.cve-pill + strong + text)`
 **Badge:** `span.badge.b-critical|b-high|b-medium|b-low|b-ok|b-eol`
+**CVE badge:** `span.badge.b-cve` (use for CVE IDs in tables instead of cve-pill when inside badge context)
 **CVE pill:** `span.cve-pill` (monospace purple)
 **Table:** `div.tbl-wrap > table > thead(th) + tbody(tr > td)` — use `.cat-row` for group headers, `.ver-old`/`.ver-new` for versions
 **Card:** `div.card > h3 + content`
@@ -89,10 +90,10 @@ function switchLang(lang,btn){
 **Upgrade cmd:** `div.upgrade-block > h4 + pre(span.cmt=comment .cmd=command .pkg=package .ver=version)`
 **Timeline:** `div.timeline > div.tl-item > div.tl-title + ul > li`
 **Report nav:** `div.report-nav > a.report-btn.active + a.report-btn`
-**OWASP grid:** `div.owasp-grid > div.owasp-item.owasp-pass|owasp-warn|owasp-fail > div.owasp-id + div.owasp-name + div.owasp-status`
-**OWASP score ring:** `div.owasp-score > div.ring > span.ring-num + small + div.ring-label`
+**OWASP grid:** `div.owasp-grid > div.owasp-item.owasp-pass|owasp-warn|owasp-fail > div.owasp-id + div.owasp-name + div.owasp-status + div.owasp-detail` (owasp-detail = brief finding text, always include)
+**OWASP score ring:** `div.owasp-score > div.ring[.ring-warn if <7, .ring-fail if <5] > span.ring-num + small + div.ring-label`
 **CI/CD pipeline:** `div.pipeline-flow > div.pipe-stage.pipe-ok|pipe-warn|pipe-fail|pipe-na > div.pipe-icon + div.pipe-label + div.pipe-status`
-**CI/CD maturity:** `div.maturity-bar > div.maturity-fill[data-level="1-5"] + div.maturity-labels > span*5`
-**CI/CD OWASP score ring:** `div.owasp-score > div.ring > span.ring-num + small + div.ring-label` (reuse owasp-score pattern with "CI/CD Security" label)
+**CI/CD maturity:** `div.maturity-bar > div.maturity-fill[data-level="1-5"] + div.maturity-labels > span*5` (add `.maturity-active` to the active level span)
+**CI/CD OWASP score ring:** `div.owasp-score > div.ring[.ring-warn if <7, .ring-fail if <5] > span.ring-num + small + div.ring-label` (reuse owasp-score pattern with "CI/CD Security" label)
 **CI/CD OWASP grid:** reuse `div.owasp-grid > div.owasp-item` pattern with CICD-SEC-01..10 IDs
 **Footer:** `div.footer > p + p`
