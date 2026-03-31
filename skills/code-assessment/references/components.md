@@ -69,7 +69,7 @@ function switchLang(lang,btn){
 ## Component Cheat Sheet
 
 **Cover (tech):** `div.cover > div.wrapper > div.top-row(logo-row + report-link) + h1(span=accent) + div.subtitle + div.meta-row(meta-item*)`
-**Cover (dep):** `div.cover > div.wrapper > div.logo-row + h1(span=accent) + div.subtitle + div.meta-row(meta-item*)` (no .top-row)
+**Cover (dep):** `div.cover > div.wrapper > div.logo-row + h1(span=accent) + div.subtitle + div.meta-row(meta-item*) + div.report-link > a[href="technical-assessment-report.html"]` (link to tech report, no .top-row)
 **Lang toggle:** `div.lang-tabs > button.lang-tab.active[onclick=switchLang('en',this)]` + `button.lang-tab[onclick=switchLang('th',this)]`
 **Sections:** `div#lang-en.lang-section.active` (EN) + `div#lang-th.lang-section` (TH)
 **Section header:** `div.section > div.section-title > div.icon + text`

@@ -6,6 +6,8 @@ Read this file ONLY when generating the HTML report (Step 4).
 
 ## Report Sections (bilingual EN/TH)
 
+0. **Cover** — report title "Lighthouse Summary Report", directory path analyzed, scan date, total pages count, performance score range (min–max). Use `div.cover > h1(span=accent) + div.subtitle + div.meta-row(div.meta-item*)`.
+
 1. **Executive Summary** — status, pages tested, score range, avg/min/max stats grid
 2. **Understanding the Metrics** — table: FCP, LCP, INP, TBT, CLS, Speed Index with Good/Needs Work/Poor thresholds
    - INP thresholds: Good ≤200ms / Needs Work 201–500ms / Poor >500ms
@@ -41,3 +43,6 @@ Read this file ONLY when generating the HTML report (Step 4).
    6. Fix Best Practices — replace `unload` with `pagehide`, enable bfcache (before/after)
    7. Analyze Bundle — webpack-bundle-analyzer, source-map-explorer, rollup-plugin-visualizer, angular.json budgets
    8. Fix INP — break up long tasks with `scheduler.yield()`, debounce input handlers, avoid synchronous layout/style recalculation in event callbacks (before/after) — include only if INP > 200ms found
+
+Thai section titles: บทสรุป, ทำความเข้าใจ Metric, ภาพรวมคะแนนตามเมนู, สาเหตุหลักของปัญหา, สิ่งที่พบ, วิเคราะห์รายไฟล์เชิงลึก, ข้อเสนอแนะ, แผนการดำเนินการ, ตัวอย่างโค้ดการแก้ไข
+Thai action plan phases: Quick Wins (ทำได้ทันที), Code Optimization (ปรับปรุงโค้ด), Runtime Performance (ประสิทธิภาพ Runtime), Advanced (ขั้นสูง)
