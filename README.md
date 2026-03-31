@@ -81,6 +81,8 @@ aggregate lighthouse reports in ./reports
 lighthouse-report: ./reports
 ```
 
+> **Tip:** If you don't pass a path, the skill defaults to a folder named `lighthouse-report/` in the current directory. Name your folder `lighthouse-report/` to skip the argument entirely.
+
 Output: `lighthouse-summary-report.html` in the same directory as source reports.
 
 ---
@@ -157,7 +159,7 @@ response = client.messages.create(
     model="claude-opus-4-5",
     system=skill,
     messages=[{"role": "user", "content": "Assess: /path/to/project"}],
-    max_tokens=8096,
+    max_tokens=32768,
 )
 ```
 
