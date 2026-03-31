@@ -3,12 +3,31 @@
 Read this file ONLY when generating the HTML report (Step 4).
 CSS classes are defined in `references/styles.css`.
 
-## External Dependencies (in `<head>`)
+## HTML Page Skeleton
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lighthouse Summary Report — [Project]</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+  <style>/* paste styles.css here */</style>
+</head>
+<body>
+  <div class="cover"><!-- cover: full-width, no inner wrapper --></div>
+  <div class="wrapper">
+    <div class="lang-tabs"><!-- language toggle --></div>
+    <div id="lang-en" class="lang-section active"><!-- EN sections --></div>
+    <div id="lang-th" class="lang-section"><!-- TH sections --></div>
+  </div>
+  <div class="footer"><!-- footer --></div>
+  <script>/* paste shared JS at bottom */</script>
+</body>
+</html>
 ```
 
 ## Shared JS (bottom of file)

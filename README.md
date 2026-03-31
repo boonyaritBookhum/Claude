@@ -14,16 +14,28 @@ Supports Go, TypeScript, Angular, Node.js, Python, Java, Rust, and more.
 ### `lighthouse-report`
 Reads Lighthouse HTML report files from a directory, aggregates scores across multiple pages, and generates a single bilingual (English/Thai) summary HTML report with:
 - Performance, Accessibility, Best Practices, and SEO scores
-- Core Web Vitals (FCP, LCP, TBT, CLS, etc.)
+- Core Web Vitals (FCP, LCP, TBT, CLS, INP etc.)
 - File-level deep-dive (unused JS/CSS, render-blocking resources, layout shifts)
 - Prioritized fix recommendations with code examples
+
+### `code-security`
+Performs a deep security audit of source code and generates a bilingual (English/Thai) HTML security report with:
+- **5 parallel scan agents** — Secrets & Credentials, Injection Flaws, Auth/AuthZ, Crypto & Misconfig, Input Handling
+- **Risk score** (0–100) with severity breakdown: CRITICAL / HIGH / MEDIUM / LOW / INFO
+- Code evidence for every finding (file:line + snippet with vulnerable part highlighted)
+- Secrets summary with masked values and immediate rotation guidance
+- Security coverage map across 10 categories
+- Prioritized remediation roadmap (Immediate → Sprint 1 → Sprint 2–3 → Backlog)
+
+Supports Go, TypeScript, Angular, Node.js, Python, Java, Rust, .NET/C#, Ruby.
 
 ## Structure
 
 ```
 skills/
 ├── code-assessment/     # Technical assessment & dependency audit skill
-└── lighthouse-report/   # Lighthouse report aggregator skill
+├── lighthouse-report/   # Lighthouse report aggregator skill
+└── code-security/       # Deep security audit skill
 ```
 
 ---
@@ -162,6 +174,11 @@ Continue supports **slash commands** and **context providers**. Add the skill as
     {
       "name": "lighthouse-report",
       "description": "Aggregate Lighthouse HTML reports into a summary",
+      "prompt": "<paste skill body here>"
+    },
+    {
+      "name": "code-security",
+      "description": "Deep security audit with severity-graded findings and risk score",
       "prompt": "<paste skill body here>"
     }
   ]

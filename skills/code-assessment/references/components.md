@@ -3,6 +3,56 @@
 Read this file ONLY when generating HTML reports (Phase 2).
 CSS classes are defined in `references/styles.css`.
 
+## HTML Page Skeleton
+
+**dependency-analysis-report.html:**
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dependency Analysis Report — [Project]</title>
+  <style>/* paste styles.css here */</style>
+</head>
+<body>
+  <div class="cover"><div class="wrapper"><!-- cover (dep pattern) --></div></div>
+  <div class="wrapper">
+    <div class="lang-tabs"><!-- language toggle --></div>
+    <div id="lang-en" class="lang-section active"><!-- EN sections --></div>
+    <div id="lang-th" class="lang-section"><!-- TH sections --></div>
+  </div>
+  <div class="footer"><!-- footer --></div>
+  <script>/* paste shared JS here */</script>
+</body>
+</html>
+```
+
+**technical-assessment-report.html** (CVE Banner and Report Nav are ALWAYS VISIBLE — outside lang-sections):
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Technical Assessment Report — [Project]</title>
+  <style>/* paste styles.css here */</style>
+</head>
+<body>
+  <div class="cover"><div class="wrapper"><!-- cover (tech pattern with .top-row) --></div></div>
+  <div class="wrapper">
+    <div class="cve-banner"><!-- CVE summary: always visible, before lang tabs --></div>
+    <div class="report-nav"><!-- links to both reports: always visible --></div>
+    <div class="lang-tabs"><!-- language toggle --></div>
+    <div id="lang-en" class="lang-section active"><!-- EN sections --></div>
+    <div id="lang-th" class="lang-section"><!-- TH sections --></div>
+  </div>
+  <div class="footer"><!-- footer --></div>
+  <script>/* paste shared JS here */</script>
+</body>
+</html>
+```
+
 ## Shared JS (bottom of both reports)
 
 ```html
