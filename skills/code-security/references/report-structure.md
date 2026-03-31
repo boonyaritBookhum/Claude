@@ -42,11 +42,12 @@ Structure (EN section, repeat in TH with Thai text):
    - If no secrets found: `callout-success`
 
 7. **Files Scanned** — file-stats (total / with findings / clean) + file-index:
+   - If multiple groups detected: show `div.file-group-badge.badge-backend|badge-frontend|badge-shared` header before each group's files (🖥️ Backend / 🌐 Frontend / 📁 Shared)
    - Group 1 "Files with Findings": `.file-hit` (CRITICAL/HIGH) and `.file-warn` (MEDIUM/LOW only) — show file path + finding count badge, sorted by count desc
    - Group 2 "Clean Files": `.file-clean` — show file path + "Clean" badge
    - Each file path links to its first finding (anchor `#file-N`) — use `file-icon` 🔴 for CRITICAL/HIGH, 🟡 for MEDIUM/LOW, ✅ for clean
 
-8. **Security Coverage Map** — `div.coverage-grid` (13 cells):
+8. **Security Coverage Map** — if multiple groups detected: show `div.cov-group-label` (🖥️ Backend / 🌐 Frontend / 📁 Shared) as a header before each group's grid, with a separate `div.coverage-grid` per group. Single-group projects: no label, one grid. 13 cells per grid:
    - Secrets & Credentials
    - SQL / NoSQL Injection
    - XSS & Template Injection

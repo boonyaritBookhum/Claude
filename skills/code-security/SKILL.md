@@ -23,6 +23,13 @@ ONLY read: source code (`.go`, `.ts`, `.js`, `.py`, `.rs`, `.cs`, `.rb`, `.java`
 
 **Cap at 60 source files total.** Read in priority order: (1) auth/middleware/security files, (2) API handlers/controllers/routes, (3) database access/ORM/repositories, (4) file I/O handlers, (5) config/env files, (6) entry points, (7) utility/helper functions. Stop at 60.
 
+**Directory grouping:** Before scanning, classify every file into one of two groups based on its path:
+- **Backend** — files under directories named: `backend`, `server`, `api`, `service`, `services`, `cmd`, `internal`, `pkg`, `app` (non-UI), `src` (when paired with a backend manifest), or any directory containing `.go`, `.py`, `.java`, `.cs`, `.rb`, `.rs` as the primary language
+- **Frontend** — files under directories named: `frontend`, `client`, `web`, `ui`, `pages`, `components`, `views`, `public`, `static`, `assets`, or any directory containing `.tsx`, `.jsx`, `.vue`, `.svelte`, `.html` as the primary type
+- **Shared / Root** — config files, Docker files, manifests at the root level, or files that don't clearly belong to either group
+
+Assign a `group` tag (Backend / Frontend / Shared) to each finding. Include the group in the report's file index and coverage map header. If the project has only one group (e.g. pure backend), omit the grouping label.
+
 ---
 
 ## Phase 1: Security Scan
@@ -124,6 +131,8 @@ Create `security-audit-report.html` in `$ARGUMENTS` (or cwd).
 - No findings in a category → show green "No issues found" callout, do not skip the section
 - Zero CRITICAL/HIGH → show congratulatory callout in Executive Summary
 - Secrets section: mask values — show first 4 + `****` + last 4 chars only (e.g. `AKIA****WXYZ`)
+- No Dockerfile/docker-compose found → Docker coverage cell: `.cov-clean` with "N/A — No Docker files"
+- No file upload handlers found → File Upload coverage cell: `.cov-clean` with "N/A — No upload handlers"
 
 ---
 

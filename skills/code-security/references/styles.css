@@ -165,6 +165,12 @@ pre.code-content{padding:10px 16px;color:#cdd6f4;font-family:'Cascadia Code','Je
 .footer{text-align:center;padding:24px;color:var(--text-sm);font-size:.8rem;border-top:1px solid var(--border);margin-top:40px}
 
 /* File index */
+.file-group-badge{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;font-weight:700;padding:3px 10px;border-radius:50px;margin-bottom:8px;margin-top:4px}
+.badge-backend{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.badge-frontend{background:#fdf4ff;color:#7e22ce;border:1px solid #e9d5ff}
+.badge-shared{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
+.cov-group-label{font-size:.82rem;font-weight:700;color:var(--primary);margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.cov-group-label:first-child{margin-top:0}
 .file-index{margin-bottom:14px}
 .file-group{margin-bottom:12px}
 .file-group-title{font-size:.82rem;font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid var(--border)}
