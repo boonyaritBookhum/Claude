@@ -40,6 +40,68 @@ skills/
 
 ---
 
+## Usage Examples
+
+### `code-assessment`
+
+```
+# Assess a specific project directory
+run code assessment on ./my-go-api
+
+# Assess current directory
+audit this project and generate HTML reports
+
+# With explicit argument
+code-assessment: /Users/me/projects/backend
+```
+
+Output: `dependency-analysis-report.html` + `technical-assessment-report.html` in the target directory.
+
+---
+
+### `lighthouse-report`
+
+First, export Lighthouse reports as HTML files into a directory:
+
+```bash
+# Export from Chrome DevTools: Lighthouse tab → Download report → HTML
+# Or run via CLI:
+npx lighthouse https://example.com --output html --output-path ./reports/home.html
+npx lighthouse https://example.com/about --output html --output-path ./reports/about.html
+npx lighthouse https://example.com/products --output html --output-path ./reports/products.html
+```
+
+Then invoke the skill:
+
+```
+# Pass directory containing the HTML files
+aggregate lighthouse reports in ./reports
+
+# Or with argument
+lighthouse-report: ./reports
+```
+
+Output: `lighthouse-summary-report.html` in the same directory as source reports.
+
+---
+
+### `code-security`
+
+```
+# Audit a specific project
+security audit ./my-api
+
+# Check for secrets and vulnerabilities
+find vulnerabilities in /path/to/project
+
+# With explicit argument
+code-security: ./src
+```
+
+Output: `security-audit-report.html` in the target directory with risk score (0–100), severity-graded findings, code evidence, and remediation roadmap.
+
+---
+
 ## How to Use Skills by Vendor
 
 ### GitHub Copilot (VS Code)
@@ -51,7 +113,14 @@ Skills are natively supported as **agent customization files** (`.skill.md` / `S
 3. Copilot automatically discovers skill files in your workspace. Invoke a skill by describing the task — Copilot will match it to the skill's `description` field.
 
 ```
-@workspace run code assessment on ./my-project
+# code-assessment
+run code assessment on ./my-project
+
+# lighthouse-report
+aggregate lighthouse reports in ./reports
+
+# code-security
+security audit ./my-api
 ```
 
 > The `argument-hint` in each skill's frontmatter tells you what argument to pass (e.g. a directory path).
@@ -63,7 +132,7 @@ Skills are natively supported as **agent customization files** (`.skill.md` / `S
 Claude does not auto-discover skill files. Copy the skill content and paste it as a **system prompt** or at the start of your conversation.
 
 **Option A — Paste skill inline:**
-1. Open `skills/code-assessment/SKILL.md`.
+1. Open the skill file (e.g. `skills/code-assessment/SKILL.md`).
 2. Copy the full content (everything after the frontmatter `---`).
 3. Paste it into your Claude conversation before your request:
 
@@ -77,6 +146,10 @@ Now run the assessment on: /path/to/project
 ```python
 import anthropic, pathlib
 
+# Choose the skill you want to invoke:
+# skills/code-assessment/SKILL.md
+# skills/lighthouse-report/SKILL.md
+# skills/code-security/SKILL.md
 skill = pathlib.Path("skills/code-assessment/SKILL.md").read_text()
 
 client = anthropic.Anthropic()
@@ -95,9 +168,12 @@ response = client.messages.create(
 Cursor supports custom instructions via `.cursor/rules/` (MDC format) or the legacy `.cursorrules` file.
 
 **Option A — Rules directory (recommended):**
-1. Create `.cursor/rules/code-assessment.mdc` in your project root.
-2. Paste the skill content (strip the YAML frontmatter, or keep it — Cursor ignores unknown frontmatter).
-3. Cursor will apply the rule automatically when you open Chat or Composer.
+1. Create a `.mdc` file per skill in `.cursor/rules/` in your project root:
+   - `.cursor/rules/code-assessment.mdc`
+   - `.cursor/rules/lighthouse-report.mdc`
+   - `.cursor/rules/code-security.mdc`
+2. Paste the skill body into each file (strip or keep YAML frontmatter — Cursor ignores unknown keys).
+3. Cursor will apply the matching rule automatically when you open Chat or Composer.
 
 **Option B — `.cursorrules`:**
 ```bash
@@ -106,7 +182,14 @@ cat skills/code-assessment/SKILL.md >> .cursorrules
 
 Then in Cursor Chat:
 ```
+# code-assessment
 Run a full code assessment on this project
+
+# lighthouse-report
+Aggregate lighthouse reports in ./reports
+
+# code-security
+Security audit ./src
 ```
 
 ---
@@ -115,11 +198,21 @@ Run a full code assessment on this project
 
 Windsurf uses **Rules** stored in `.windsurf/rules/` or a `AGENTS.md` / `.windsurfrules` file.
 
-1. Copy the skill body into `.windsurfrules` or `.windsurf/rules/code-assessment.md`.
+1. Copy the skill body into `.windsurfrules` or a per-skill file under `.windsurf/rules/`:
+   - `.windsurf/rules/code-assessment.md`
+   - `.windsurf/rules/lighthouse-report.md`
+   - `.windsurf/rules/code-security.md`
 2. Open the **Cascade** panel and type your request:
 
 ```
+# code-assessment
 Perform a technical assessment and generate the HTML reports
+
+# lighthouse-report
+Aggregate lighthouse reports in ./reports and generate a summary
+
+# code-security
+Run a deep security audit on this project
 ```
 
 Windsurf Cascade will follow the skill instructions for multi-step tool use.
@@ -136,9 +229,17 @@ Cline supports **custom instructions** via its settings and references local fil
 
 **Option B — Reference at runtime:**
 ```
+# code-assessment
 @file:skills/code-assessment/SKILL.md
-
 Run a code assessment on ./my-project
+
+# lighthouse-report
+@file:skills/lighthouse-report/SKILL.md
+Aggregate lighthouse reports in ./reports
+
+# code-security
+@file:skills/code-security/SKILL.md
+Security audit ./src
 ```
 
 ---
@@ -148,11 +249,17 @@ Run a code assessment on ./my-project
 Aider loads custom prompts from files using `--read` or inline with `/add`.
 
 ```bash
-# Pass the skill as a read-only context file
+# code-assessment
 aider --read skills/code-assessment/SKILL.md
+# In REPL: > Run a full code assessment on ./my-project
 
-# Then in the aider REPL:
-> Run a full code assessment on this project and generate the HTML reports
+# lighthouse-report
+aider --read skills/lighthouse-report/SKILL.md
+# In REPL: > Aggregate lighthouse reports in ./reports
+
+# code-security
+aider --read skills/code-security/SKILL.md
+# In REPL: > Security audit ./src
 ```
 
 ---
@@ -189,6 +296,8 @@ Continue supports **slash commands** and **context providers**. Add the skill as
 
 ```
 /code-assessment ./my-project
+/lighthouse-report ./reports
+/code-security ./src
 ```
 
 ---
