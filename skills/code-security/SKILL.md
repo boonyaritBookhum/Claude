@@ -15,13 +15,21 @@ Generate one bilingual (EN/TH) HTML report: `security-audit-report.html`.
 - If `$ARGUMENTS` is empty, use cwd.
 - If `security-audit-report.html` already exists, inform user it will be overwritten and proceed.
 
+**Monorepo / root-directory detection:** If the resolved path is `.`, `/`, cwd, or a directory with **no manifest at the top level**, scan one level of sub-directories to find project roots:
+1. List immediate sub-directories (skip: `.git`, `node_modules`, `vendor`, `dist`, `build`, `out`, `.next`, `.angular`, `coverage`, `__pycache__`).
+2. A sub-directory is a **project root** if it contains any manifest: `go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`, `Dockerfile`.
+3. If 2+ project roots are found: scan each root independently (prioritize roots with security-sensitive names: api, auth, backend, server).
+4. If only 1 project root is found: treat it as the scan target.
+5. If no project roots found in sub-directories: scan the given path as-is (flat scan).
+6. Tell the user which sub-directories were identified as project roots before starting the scan.
+
 ## Files to SKIP (save tokens)
 
 NEVER read: `node_modules/`, `vendor/`, `.git/`, `dist/`, `build/`, `out/`, `.next/`, `.angular/`, `coverage/`, `*.min.js`, `*.min.css`, `*.map`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `poetry.lock`, `Pipfile.lock`, `Gemfile.lock`, `go.sum`, binary files, `__pycache__/`, `*.pb.go`, `*.generated.*`, `*.snap`, `*.test.*`, `*_test.go`, `*.spec.*`
 
 ONLY read: source code (`.go`, `.ts`, `.js`, `.py`, `.rs`, `.cs`, `.rb`, `.java`), configs (`Dockerfile*`, `docker-compose*.yml`, `.dockerignore`, `.env.example`, `nginx.conf`, `*.yaml`, `*.yml` excluding lock/generated), manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`).
 
-**Cap at 60 source files total.** Read in priority order: (1) auth/middleware/security files, (2) API handlers/controllers/routes, (3) database access/ORM/repositories, (4) file I/O handlers, (5) config/env files, (6) entry points, (7) utility/helper functions. Stop at 60.
+Read in priority order: (1) auth/middleware/security files, (2) API handlers/controllers/routes, (3) database access/ORM/repositories, (4) file I/O handlers, (5) config/env files, (6) entry points, (7) utility/helper functions.
 
 **Directory grouping:** Before scanning, classify every file into one of two groups based on its path:
 - **Backend** — files under directories named: `backend`, `server`, `api`, `service`, `services`, `cmd`, `internal`, `pkg`, `app` (non-UI), `src` (when paired with a backend manifest), or any directory containing `.go`, `.py`, `.java`, `.cs`, `.rb`, `.rs` as the primary language
