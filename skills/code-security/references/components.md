@@ -12,7 +12,6 @@ CSS classes are defined in `references/styles.css`.
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Security Audit Report — [Project Name]</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   <style>/* paste styles.css here */</style>
 </head>
 <body>
@@ -57,11 +56,13 @@ document.addEventListener('DOMContentLoaded',()=>{
 **Lang toggle:** `div.lang-tabs > button.lang-tab.active[onclick=switchLang('en',this)] + button.lang-tab[onclick=switchLang('th',this)]`
 **Sections:** `div#lang-en.lang-section.active` (EN) + `div#lang-th.lang-section` (TH)
 **Section header:** `div.section > div.section-title > div.icon + text`
-**Finding card:** `div.finding-card.finding-critical|high|medium|low|info > span.sev.sev-X + strong(title) + span.loc(file:line) + div.code-window + div.finding-desc + div.finding-fix`
+**Finding card:** `div.finding-card.finding-critical|high|medium|low|info[id="file-N"] > span.sev.sev-X + strong(title) + span.cwe("CWE-XXX") + span.loc(file:line) + div.code-window + div.finding-what(strong("What is it / คืออะไร") + p) + div.finding-why(strong("Why dangerous / ทำไมถึงอันตราย") + p) + div.finding-fix(strong("Remediation / การแก้ไข") + ol|p)`
+**CWE pill:** `span.cwe` — e.g. `<span class="cwe">CWE-89</span>` (always include per finding, ref vuln-patterns.md)
 **Severity badge:** `span.sev.sev-critical|sev-high|sev-medium|sev-low|sev-info`
 **Summary grid:** `div.summary-grid > div.scard.scard-critical|high|medium|low|info > div.num + div.lbl`
-**Risk gauge:** `div.risk-gauge > div.score-num + div.score-label + div.score-bar > div.score-fill[style="width:X%;background:#color"]`
+**Risk gauge:** `div.risk-gauge > div.score-num + div.score-label + div.score-bar > div.score-fill[style="width:X%;background:#color"] + div.score-range > span("0") + span("100")`
   Fill color per level: Critical `#dc2626`, High `#ea580c`, Medium `#ca8a04`, Low `#16a34a`
+**Stats row:** `div.stats-row > div.stat-item > span.stat-num(N) + span.stat-label("files scanned"|"findings"|"scope")`
 **Callout:** `div.callout.callout-success|warn|danger|info`
 **Table:** `div.tbl-wrap > table > thead(th) + tbody(tr > td)` — location in `span.loc`
 **Coverage grid:** `div.coverage-grid > div.cov-item.cov-clean|warn|critical > div.cov-head(div.cov-icon(emoji) + span.cov-name) + div.cov-status("✅ Clean"|"⚠️ N issues"|"🔴 N issues")`

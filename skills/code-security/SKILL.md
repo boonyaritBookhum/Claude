@@ -1,6 +1,6 @@
 ---
 name: code-security
-description: "Perform a deep security audit of source code and generate a bilingual (EN/TH) HTML security report with severity-graded findings, code evidence, and remediation guidance. Covers: hardcoded secrets/credentials, injection flaws (SQL/XSS/OS/template/LDAP), broken auth & IDOR, cryptographic weaknesses, path traversal, insecure deserialization, CORS/header misconfig, sensitive data exposure, and ReDoS. Trigger when user asks: security audit, find vulnerabilities, secret scan, security review, SAST, find XSS, find SQL injection, security hardening, pen test prep, check for secrets."
+description: "Perform a deep security audit of source code and generate a bilingual (EN/TH) HTML security report with CWE-mapped findings, code evidence, and remediation guidance. Covers: hardcoded secrets/credentials, injection flaws (SQL/XSS/OS/template/LDAP), broken auth & IDOR, cryptographic weaknesses, path traversal, insecure deserialization, CORS/header misconfig, sensitive data exposure, ReDoS, Docker/container security, API security (rate limiting/over-fetching/GraphQL), and file upload vulnerabilities. Trigger when user asks: security audit, find vulnerabilities, secret scan, security review, SAST, find XSS, find SQL injection, security hardening, pen test prep, check for secrets, Docker security, API security, file upload security."
 argument-hint: "[project-path or leave empty for current directory]"
 ---
 
@@ -19,7 +19,7 @@ Generate one bilingual (EN/TH) HTML report: `security-audit-report.html`.
 
 NEVER read: `node_modules/`, `vendor/`, `.git/`, `dist/`, `build/`, `out/`, `.next/`, `.angular/`, `coverage/`, `*.min.js`, `*.min.css`, `*.map`, `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml`, `bun.lockb`, `poetry.lock`, `Pipfile.lock`, `Gemfile.lock`, `go.sum`, binary files, `__pycache__/`, `*.pb.go`, `*.generated.*`, `*.snap`, `*.test.*`, `*_test.go`, `*.spec.*`
 
-ONLY read: source code (`.go`, `.ts`, `.js`, `.py`, `.rs`, `.cs`, `.rb`, `.java`), configs (`Dockerfile`, `docker-compose.yml`, `.env.example`, `nginx.conf`, `*.yaml`, `*.yml` excluding lock/generated), manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`).
+ONLY read: source code (`.go`, `.ts`, `.js`, `.py`, `.rs`, `.cs`, `.rb`, `.java`), configs (`Dockerfile*`, `docker-compose*.yml`, `.dockerignore`, `.env.example`, `nginx.conf`, `*.yaml`, `*.yml` excluding lock/generated), manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`).
 
 **Cap at 60 source files total.** Read in priority order: (1) auth/middleware/security files, (2) API handlers/controllers/routes, (3) database access/ORM/repositories, (4) file I/O handlers, (5) config/env files, (6) entry points, (7) utility/helper functions. Stop at 60.
 
@@ -29,7 +29,8 @@ ONLY read: source code (`.go`, `.ts`, `.js`, `.py`, `.rs`, `.cs`, `.rb`, `.java`
 
 **Before starting agents**, read `references/vuln-patterns.md` for language-specific vulnerability patterns.
 
-> **Run all 5 scan agents in parallel** — launch simultaneously once file list and vuln-patterns are loaded.
+> **Run all 7 scan agents in parallel** — launch simultaneously once file list and vuln-patterns are loaded.
+> Every finding MUST include the relevant CWE ID from `references/vuln-patterns.md`.
 
 **Agent A — Secrets & Credentials:**
 Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connection strings, cloud credentials (AWS/GCP/Azure). Match against patterns in `references/vuln-patterns.md` Secrets section.
@@ -63,13 +64,35 @@ Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connect
 - Missing security headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options
 - Debug/dev mode flags enabled in production configs
 
-**Agent E — Input Handling & Logic:**
+**Agent E — Input Handling, File Upload & Logic:**
 - Path traversal: user-controlled paths without sanitization (no `basename`, no allowlist)
 - Unsafe deserialization: `pickle.loads`, `yaml.load` without SafeLoader, Java `ObjectInputStream`, `BinaryFormatter`
 - Unvalidated redirects: user-controlled redirect URLs without allowlist
 - ReDoS: catastrophic-backtracking regex patterns applied to user input
 - Integer overflow in security-critical calculations (token expiry, quota checks)
 - Race condition (TOCTOU): check-then-use pattern on files or shared state
+- **File upload**: no file type validation (MIME/magic bytes), no size limit, saving to web-accessible path, using unsanitized original filename, no content validation (SVG XSS, zip bombs). Match against `references/vuln-patterns.md` File Upload section.
+
+**Agent F — Docker & Container Security:**
+Scan `Dockerfile`, `docker-compose.yml`, `.dockerignore` and container-related configs. Match against `references/vuln-patterns.md` Docker section.
+- Running as root (no `USER` instruction or `USER root`)
+- Unpinned base image tags (`:latest` or no tag)
+- Secrets in `ARG`/`ENV`/`environment:` as literal values
+- `COPY . .` without `.dockerignore` — leaks `.env`, `.git`, secrets
+- `privileged: true`, `network_mode: host`, Docker socket mount
+- No multi-stage build, no `HEALTHCHECK`, unnecessary tools in prod image
+- No resource limits in compose (`mem_limit`, `cpus`)
+
+**Agent G — API Security:**
+Scan route handlers, controllers, middleware for API-specific issues. Match against `references/vuln-patterns.md` API section.
+- Missing rate limiting on auth/public endpoints
+- Data over-fetching: returning full DB objects without DTO/serializer
+- Missing pagination: unbounded `SELECT *` / `.find({})` without `LIMIT`
+- No request body schema validation (no joi/zod/pydantic/class-validator)
+- GraphQL: introspection enabled in prod, no query depth/complexity limit
+- Sensitive data in URL query params (tokens in GET requests)
+- Bulk endpoints without size limits
+- Mass assignment: accepting arbitrary keys from request body
 
 ---
 
