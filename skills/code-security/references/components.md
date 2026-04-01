@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 **Lang toggle:** `div.lang-tabs > button.lang-tab.active[onclick=switchLang('en',this)] + button.lang-tab[onclick=switchLang('th',this)]`
 **Sections:** `div#lang-en.lang-section.active` (EN) + `div#lang-th.lang-section` (TH)
 **Section header:** `div.section > div.section-title > div.icon + text`
-**Finding card:** `div.finding-card.finding-critical|high|medium|low|info[id="file-N"] > span.sev.sev-X + strong(title) + span.cwe("CWE-XXX") + span.loc(file:line) + div.code-window + div.finding-what(strong("What is it / คืออะไร") + p) + div.finding-why(strong("Why dangerous / ทำไมถึงอันตราย") + p) + div.finding-fix(strong("Remediation / การแก้ไข") + ol|p)`
+**Finding card (EN):** `div.finding-card.finding-critical|high|medium|low|info[id="file-N"] > span.sev.sev-X + strong(title) + span.cwe("CWE-XXX") + span.loc(file:line) + div.code-window + div.finding-what(strong("What is it") + p) + div.finding-why(strong("Why dangerous") + p) + div.finding-fix(strong("Remediation") + ol|p)`
+**Finding card (TH):** same structure — replace labels: `finding-what` → `strong("คืออะไร")`, `finding-why` → `strong("ทำไมถึงอันตราย")`, `finding-fix` → `strong("การแก้ไข")` — translate body text to Thai; keep code snippets, file paths, severity badges (CRITICAL/HIGH/MEDIUM/LOW/INFO), and CWE IDs in English
 **CWE pill:** `span.cwe` — e.g. `<span class="cwe">CWE-89</span>` (always include per finding, ref vuln-patterns.md)
 **Severity badge:** `span.sev.sev-critical|sev-high|sev-medium|sev-low|sev-info`
 **Summary grid:** `div.summary-grid > div.scard.scard-critical|high|medium|low|info > div.num + div.lbl`

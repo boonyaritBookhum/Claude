@@ -1,6 +1,6 @@
 ---
 name: code-assessment
-description: "Generate two bilingual (EN/TH) HTML reports for a software project: (1) Dependency Analysis — CVE scanning, version audit, upgrade commands, (2) Technical Assessment — code quality grades, architecture, OWASP Top 10 (2025), CI/CD maturity, OWASP CI/CD Security Risks, action plan. Trigger for: audit, assess, scan dependencies, check CVEs, code review, technical debt, OWASP, CI/CD audit, pipeline security, supply chain. Works with Go, TypeScript, Angular, Node.js, Python, Java, Rust, .NET/C#, Ruby."
+description: "Generate two bilingual (EN/TH) HTML reports: (1) Dependency Analysis — CVE scanning, version audit, upgrade commands, (2) Technical Assessment — code quality grades, architecture, OWASP Top 10 (2025), CI/CD maturity, OWASP CI/CD Security Risks, action plan. Trigger: audit, assess, scan dependencies, check CVEs, code review, technical debt, OWASP, CI/CD audit, pipeline security. Works with Go, TypeScript, Angular, Node.js, Python, Java, Rust, .NET/C#, Ruby."
 argument-hint: "[project-path or leave empty for current directory]"
 ---
 

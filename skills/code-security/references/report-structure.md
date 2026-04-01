@@ -6,7 +6,7 @@ Read this file ONLY when generating the HTML report (Phase 3).
 
 ## security-audit-report.html
 
-Structure (EN section, repeat in TH with Thai text):
+Structure (EN section — see "TH Section" at the bottom for Thai strings and translation rules):
 
 1. **Cover** — logo-box=🔐, project name from path, scan date, risk level badge (`.risk-critical|high|medium|low`)
 
@@ -71,5 +71,81 @@ Structure (EN section, repeat in TH with Thai text):
    - 🟡 **Sprint 2–3**: address MEDIUM findings, add security headers, improve crypto, fix path traversal, harden Docker images (multi-stage, pin versions), add API pagination & schema validation
    - 🟢 **Backlog**: LOW/INFO hardening, SAST integration in CI/CD, dependency scanning, security testing, container scanning, API versioning
 
-Thai section titles: สรุปผู้บริหาร, ช่องโหว่ระดับวิกฤตและสูง, ช่องโหว่ระดับปานกลาง, ช่องโหว่ระดับต่ำ, ข้อมูลลับและ Credential, ไฟล์ที่ตรวจสอบ, แผนที่การตรวจสอบ, แผนการแก้ไข
-Thai roadmap labels: ดำเนินการทันที (วันนี้), Sprint 1 (1–2 สัปดาห์), Sprint 2–3 (1 เดือน), Backlog (ระยะยาว)
+---
+
+## TH Section — Translation Reference
+
+**Rule:** In `#lang-th`, translate general UI text and labels to Thai. Keep in English always:
+- Severity ratings: CRITICAL / HIGH / MEDIUM / LOW / INFO
+- Risk levels: Low / Medium / High / Critical
+- CWE IDs, file paths, code snippets
+- All security vulnerability category names (e.g. Authentication & Authorization, Cryptographic Issues, Sensitive Data Exposure, Security Misconfiguration, Insecure Deserialization, Secrets & Credentials — see Coverage Grid below)
+- Technical security terms: XSS, SQL Injection, IDOR, JWT, CSRF, CORS, SSTI, LDAP, ReDoS, MIME, DTO, API, Credential, Secret, Sprint, Backlog
+
+### Section Titles
+| EN | TH |
+|---|---|
+| Executive Summary | สรุปผู้บริหาร |
+| Critical & High Findings | ช่องโหว่ระดับวิกฤตและสูง |
+| Medium Findings | ช่องโหว่ระดับปานกลาง |
+| Low & Info Findings | ช่องโหว่ระดับต่ำและข้อมูล |
+| Secrets & Credentials | ข้อมูลลับและ Credential |
+| Files Scanned | ไฟล์ที่ตรวจสอบ |
+| Security Coverage Map | แผนที่การตรวจสอบ |
+| Remediation Roadmap | แผนการแก้ไข |
+
+### Stats Row
+| EN | TH |
+|---|---|
+| files scanned | ไฟล์ที่ตรวจสอบ |
+| findings | ช่องโหว่ที่พบ |
+| scope | ขอบเขต |
+
+### File Index
+| EN | TH |
+|---|---|
+| Files with Findings | ไฟล์ที่มีปัญหา |
+| Clean Files | ไฟล์ที่ปลอดภัย |
+| Clean | ปลอดภัย |
+| N findings | N ปัญหา |
+
+### Coverage Grid Categories
+Keep all 13 category names in English — they are security technical terms:
+Secrets & Credentials / SQL / NoSQL Injection / XSS & Template Injection / OS Command Injection / Path Traversal / Authentication & Authorization / Cryptographic Issues / Sensitive Data Exposure / Security Misconfiguration / Insecure Deserialization / Docker / Container Security / API Security / File Upload Security
+
+### Coverage Status
+| EN | TH |
+|---|---|
+| ✅ Clean | ✅ ปลอดภัย |
+| ⚠️ N issues | ⚠️ N ปัญหา |
+| 🔴 N issues | 🔴 N ปัญหา |
+| N/A — No Docker files | N/A — ไม่มีไฟล์ Docker |
+| N/A — No upload handlers | N/A — ไม่มี upload handler |
+
+### Risk Score Labels
+Keep risk level names (Low / Medium / High / Critical) in English. Only the gauge label can use Thai:
+| EN | TH |
+|---|---|
+| Risk Score | คะแนนความเสี่ยง |
+
+### Remediation Roadmap
+| EN | TH |
+|---|---|
+| 🔴 Immediate (Today) | 🔴 ดำเนินการทันที (วันนี้) |
+| 🟠 Sprint 1 (1–2 weeks) | 🟠 Sprint 1 (1–2 สัปดาห์) |
+| 🟡 Sprint 2–3 (1 month) | 🟡 Sprint 2–3 (1 เดือน) |
+| 🟢 Backlog (Long term) | 🟢 Backlog (ระยะยาว) |
+
+### Secrets Section
+| EN | TH |
+|---|---|
+| Type | ประเภท |
+| File:Line | ไฟล์:บรรทัด |
+| Value | ค่า |
+| Rotate all exposed secrets immediately | เปลี่ยน credential ที่รั่วไหลทั้งหมดทันที |
+
+### Callout Messages
+| EN | TH |
+|---|---|
+| No critical vulnerabilities found | ไม่พบช่องโหว่ระดับวิกฤตหรือสูง |
+| No issues found | ไม่พบปัญหาในหมวดนี้ |

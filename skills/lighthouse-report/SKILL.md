@@ -1,6 +1,6 @@
 ---
 name: lighthouse-report
-description: "Aggregate Lighthouse HTML report files from a directory and generate a bilingual (EN/TH) summary HTML report with charts, file-level deep-dive, and fix examples. Trigger when user mentions: Lighthouse reports, performance audit, Core Web Vitals, page speed, or wants to combine multiple Lighthouse HTML files."
+description: "Aggregate Lighthouse HTML report files and generate a bilingual (EN/TH) summary HTML report with charts, file-level analysis, and fix examples. Trigger: Lighthouse reports, performance audit, Core Web Vitals, page speed, combine multiple Lighthouse HTML files."
 argument-hint: "[directory-path]"
 ---
 

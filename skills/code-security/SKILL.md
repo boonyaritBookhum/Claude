@@ -1,6 +1,6 @@
 ---
 name: code-security
-description: "Perform a deep security audit of source code and generate a bilingual (EN/TH) HTML security report with CWE-mapped findings, code evidence, and remediation guidance. Covers: hardcoded secrets/credentials, injection flaws (SQL/XSS/OS/template/LDAP), broken auth & IDOR, cryptographic weaknesses, path traversal, insecure deserialization, CORS/header misconfig, sensitive data exposure, ReDoS, Docker/container security, API security (rate limiting/over-fetching/GraphQL), and file upload vulnerabilities. Trigger when user asks: security audit, find vulnerabilities, secret scan, security review, SAST, find XSS, find SQL injection, security hardening, pen test prep, check for secrets, Docker security, API security, file upload security."
+description: "Deep security audit of source code — bilingual (EN/TH) HTML report with CWE-mapped findings and remediation. Covers: hardcoded secrets, SQL/XSS/OS/template/LDAP injection, broken auth & IDOR, crypto weaknesses, path traversal, insecure deserialization, CORS/header misconfig, sensitive data exposure, ReDoS, Docker/container security, API security, file upload vulnerabilities. Trigger: security audit, vulnerability scan, secret scan, SAST, XSS, SQL injection, security hardening, pen test prep, Docker security, API security."
 argument-hint: "[project-path or leave empty for current directory]"
 ---
 
