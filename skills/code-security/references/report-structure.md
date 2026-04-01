@@ -47,11 +47,12 @@ Structure (EN section — see "TH Section" at the bottom for Thai strings and tr
    - Group 2 "Clean Files": `.file-clean` — show file path + "Clean" badge
    - Each file path links to its first finding (anchor `#file-N`) — use `file-icon` 🔴 for CRITICAL/HIGH, 🟡 for MEDIUM/LOW, ✅ for clean
 
-8. **Security Coverage Map** — if multiple groups detected: show `div.cov-group-label` (🖥️ Backend / 🌐 Frontend / 📁 Shared) as a header before each group's grid, with a separate `div.coverage-grid` per group. Single-group projects: no label, one grid. 13 cells per grid:
+8. **Security Coverage Map** — if multiple groups detected: show `div.cov-group-label` (🖥️ Backend / 🌐 Frontend / 📁 Shared) as a header before each group's grid, with a separate `div.coverage-grid` per group. Single-group projects: no label, one grid. 14 cells per grid:
    - Secrets & Credentials
    - SQL / NoSQL Injection
    - XSS & Template Injection
    - OS Command Injection
+   - SSRF
    - Path Traversal
    - Authentication & Authorization
    - Cryptographic Issues
@@ -62,7 +63,7 @@ Structure (EN section — see "TH Section" at the bottom for Thai strings and tr
    - API Security
    - File Upload Security
    - Each cell: `.cov-clean` (icon + name + "✅ Clean") / `.cov-warn` (icon + name + "⚠️ N issues") / `.cov-critical` (icon + name + "🔴 N issues")
-   - Icons: 🔑 Secrets, 💉 SQL Injection, 🖥️ XSS, ⌨️ OS Command, 📂 Path Traversal, 🔒 Auth, 🔐 Crypto, 📋 Data Exposure, ⚙️ Misconfig, 📦 Deserialization, 🐳 Docker, 🌐 API, 📤 File Upload
+   - Icons: 🔑 Secrets, 💉 SQL Injection, 🖥️ XSS, ⌨️ OS Command, 🌍 SSRF, 📂 Path Traversal, 🔒 Auth, 🔐 Crypto, 📋 Data Exposure, ⚙️ Misconfig, 📦 Deserialization, 🐳 Docker, 🌐 API, 📤 File Upload
    - If no Dockerfile found: Docker cell shows `.cov-clean` with "N/A". If no upload handlers found: File Upload cell shows `.cov-clean` with "N/A".
 
 9. **Remediation Roadmap** — `div.timeline` (4 items):

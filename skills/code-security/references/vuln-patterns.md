@@ -1,6 +1,6 @@
 # Vulnerability Patterns Reference
 
-Read this file before starting Phase 1 scan agents.
+This file is pre-loaded into shared context by the orchestrator before agents start. Agents must NOT re-read this file — use the sections already in context.
 Every finding MUST include a CWE ID from the mappings below each section.
 
 ---
@@ -14,7 +14,7 @@ Every finding MUST include a CWE ID from the mappings below each section.
 - GitHub: `ghp_[a-zA-Z0-9]{36}`, `ghs_[a-zA-Z0-9]{36}`
 - Slack: `xox[baprs]-[0-9A-Za-z\-]+`
 - Stripe: `sk_live_[0-9a-zA-Z]{24}`, `pk_live_[0-9a-zA-Z]{24}`
-- OpenAI: `sk-[a-zA-Z0-9]{48}`
+- OpenAI: `sk-[a-zA-Z0-9]{48}`, `sk-proj-[a-zA-Z0-9_\-]{100,}`, `sk-svcacct-[a-zA-Z0-9_\-]{100,}`
 - PEM: `-----BEGIN (RSA |EC |)PRIVATE KEY-----`
 
 **Generic credential variable names assigned to a literal string** (flag if value is not a placeholder like `your_key_here`, `<SECRET>`, `$ENV_VAR`, `os.getenv`):

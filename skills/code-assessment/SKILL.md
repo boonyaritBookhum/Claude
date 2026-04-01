@@ -39,7 +39,7 @@ ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.t
 - Generate upgrade commands per package manager:
   - Go: `go get pkg@ver`
   - Node.js/npm: `npm install pkg@ver`
-  - Node.js/yarn: `yarn add pkg@ver` / Node.js/pnpm: `pnpm add pkg@ver`
+  - Node.js/yarn: `yarn add pkg@ver` / Node.js/pnpm: `pnpm add pkg@ver` / Node.js/bun: `bun add pkg@ver`
   - Python/pip: `pip install pkg==ver`
   - Python/poetry: `poetry add pkg@ver`
   - Python/uv: `uv add pkg==ver`
@@ -70,7 +70,7 @@ For each CICD-SEC risk: rate as PASS / WARN / FAIL with evidence. Generate overa
 
 ## Phase 2: Generate Reports
 
-**When ready to generate**, read these reference files (in order):
+**When ready to generate**, read all three reference files **simultaneously (in parallel)**:
 - `references/styles.css` — paste into `<style>` tag of both reports
 - `references/components.md` — HTML component patterns + shared JS
 - `references/report-structure.md` — full section structure for both reports

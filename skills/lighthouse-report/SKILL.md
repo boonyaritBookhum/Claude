@@ -80,7 +80,7 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 ## Step 4: Generate HTML report
 
-**When ready to generate**, read these reference files (in order) — located in the **same directory as this skill file** (not the report directory):
+**When ready to generate**, read all three reference files **simultaneously (in parallel)** — located in the **same directory as this skill file** (not the report directory):
 - `references/styles.css` — paste into `<style>` tag
 - `references/components.md` — HTML component patterns, Chart.js setup, shared JS
 - `references/report-structure.md` — full section structure and code example list

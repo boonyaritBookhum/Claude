@@ -42,13 +42,13 @@ Assign a `group` tag (Backend / Frontend / Shared) to each finding. Include the 
 
 ## Phase 1: Security Scan
 
-**Before starting agents**, read `references/vuln-patterns.md` for language-specific vulnerability patterns.
+**Before starting agents**, read `references/vuln-patterns.md` once — its contents are loaded into shared context for all agents. **Agents must NOT re-read this file.**
 
 > **Run all 7 scan agents in parallel** — launch simultaneously once file list and vuln-patterns are loaded.
 > Every finding MUST include the relevant CWE ID from `references/vuln-patterns.md`.
 
 **Agent A — Secrets & Credentials:**
-Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connection strings, cloud credentials (AWS/GCP/Azure). Match against patterns in `references/vuln-patterns.md` Secrets section.
+Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connection strings, cloud credentials (AWS/GCP/Azure). Use the **Secrets** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 - CRITICAL: live-looking credential (matches known key format, non-placeholder value)
 - HIGH: generic password/token variable assigned a literal string value
 
@@ -59,6 +59,8 @@ Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connect
 - Template injection (SSTI): user input passed to template engine at render time
 - LDAP/NoSQL: unsanitized user input in query operators or filter strings
 - Header injection: user input written directly into HTTP response headers
+- SSRF: user-controlled URLs passed to HTTP client functions (`http.Get`, `fetch`, `requests.get`, `HttpClient`) without an allowlist — enables access to internal services or cloud metadata endpoints
+Use language-specific code patterns from the **Injection** section of `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 
 **Agent C — Auth, Authorization & Session:**
 - Missing authentication on sensitive endpoints (no middleware guard, no inline check)
@@ -69,6 +71,7 @@ Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connect
 - JWT issues: `alg:none`, weak secret, missing expiry/signature validation
 - Timing attack: `==` comparison for tokens instead of constant-time compare
 - CSRF: state-changing endpoints (POST/PUT/PATCH/DELETE) without CSRF token validation or `SameSite` cookie attribute; check for anti-CSRF middleware or framework-level protection
+Use **Auth & Session** and **CSRF** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 
 **Agent D — Crypto, Data Exposure & Misconfiguration:**
 - Weak/broken crypto: MD5/SHA1 for security, DES/3DES/RC4, ECB mode
@@ -78,6 +81,7 @@ Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connect
 - Permissive CORS: `Access-Control-Allow-Origin: *` combined with credentials
 - Missing security headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options
 - Debug/dev mode flags enabled in production configs
+Use **Crypto** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 
 **Agent E — Input Handling, File Upload & Logic:**
 - Path traversal: user-controlled paths without sanitization (no `basename`, no allowlist)
@@ -86,10 +90,11 @@ Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connect
 - ReDoS: catastrophic-backtracking regex patterns applied to user input
 - Integer overflow in security-critical calculations (token expiry, quota checks)
 - Race condition (TOCTOU): check-then-use pattern on files or shared state
-- **File upload**: no file type validation (MIME/magic bytes), no size limit, saving to web-accessible path, using unsanitized original filename, no content validation (SVG XSS, zip bombs). Match against `references/vuln-patterns.md` File Upload section.
+- **File upload**: no file type validation (MIME/magic bytes), no size limit, saving to web-accessible path, using unsanitized original filename, no content validation (SVG XSS, zip bombs). Use **File Upload** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
+Use **Injection** section patterns (path traversal, unsafe deserialization) from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 
 **Agent F — Docker & Container Security:**
-Scan `Dockerfile`, `docker-compose.yml`, `.dockerignore` and container-related configs. Match against `references/vuln-patterns.md` Docker section.
+Scan `Dockerfile`, `docker-compose.yml`, `.dockerignore` and container-related configs. Use **Docker & Container Security** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 - Running as root (no `USER` instruction or `USER root`)
 - Unpinned base image tags (`:latest` or no tag)
 - Secrets in `ARG`/`ENV`/`environment:` as literal values
@@ -99,7 +104,7 @@ Scan `Dockerfile`, `docker-compose.yml`, `.dockerignore` and container-related c
 - No resource limits in compose (`mem_limit`, `cpus`)
 
 **Agent G — API Security:**
-Scan route handlers, controllers, middleware for API-specific issues. Match against `references/vuln-patterns.md` API section.
+Scan route handlers, controllers, middleware for API-specific issues. Use **API Security** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
 - Missing rate limiting on auth/public endpoints
 - Data over-fetching: returning full DB objects without DTO/serializer
 - Missing pagination: unbounded `SELECT *` / `.find({})` without `LIMIT`
@@ -128,7 +133,7 @@ After all agents complete:
 
 ## Phase 3: Generate Report
 
-**When ready to generate**, read these reference files (in order) — located in the **same directory as this skill file**:
+**When ready to generate**, read all three reference files **simultaneously (in parallel)** — located in the **same directory as this skill file**:
 - `references/styles.css` — paste into `<style>` tag
 - `references/components.md` — HTML component patterns + shared JS
 - `references/report-structure.md` — full section structure
