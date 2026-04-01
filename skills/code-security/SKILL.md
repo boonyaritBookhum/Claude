@@ -47,79 +47,40 @@ Assign a `group` tag (Backend / Frontend / Shared) to each finding. Include the 
 > **Run all 7 scan agents in parallel** — launch simultaneously once file list and vuln-patterns are loaded.
 > Every finding MUST include the relevant CWE ID from `references/vuln-patterns.md`.
 
-**Agent A — Secrets & Credentials:**
-Scan ALL files for hardcoded: API keys, passwords, tokens, private keys, connection strings, cloud credentials (AWS/GCP/Azure). Use the **Secrets** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
-- CRITICAL: live-looking credential (matches known key format, non-placeholder value)
-- HIGH: generic password/token variable assigned a literal string value
+### Scanning strategy (applies to ALL agents)
 
-**Agent B — Injection Flaws:**
-- SQL: string concat/interpolation in queries — no parameterized queries
-- OS command: `exec`/`spawn`/`system` with user-controlled args
-- XSS: unescaped user input rendered as HTML (`innerHTML`, `dangerouslySetInnerHTML`, `eval`)
-- Template injection (SSTI): user input passed to template engine at render time
-- LDAP/NoSQL: unsanitized user input in query operators or filter strings
-- Header injection: user input written directly into HTTP response headers
-- SSRF: user-controlled URLs passed to HTTP client functions (`http.Get`, `fetch`, `requests.get`, `HttpClient`) without an allowlist — enables access to internal services or cloud metadata endpoints
-Use language-specific code patterns from the **Injection** section of `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
+1. **Grep first** — use pattern matching (grep/ripgrep) to find candidate lines before reading files. Do NOT read files line-by-line.
+2. **Cap**: process max **200 grep matches per agent**. If more matches found, prioritize: auth/security files > API handlers > config > utilities.
+3. **Read only matched files** — open a file only when grep confirms a hit. Read ±20 lines around the match for context.
+4. **Per-file limit**: max **500 lines per file read**. For larger files, read only the matched regions.
+5. **Report format**: each finding = `{file, line, cwe, severity, evidence (1–3 line snippet)}`.
 
-**Agent C — Auth, Authorization & Session:**
-- Missing authentication on sensitive endpoints (no middleware guard, no inline check)
-- IDOR: object IDs from user input used in queries without ownership verification
-- Broken access control: privileged operations without role/permission checks
-- Insecure session: missing `HttpOnly`/`Secure`/`SameSite` cookie flags, no expiry
-- Weak password handling: plaintext storage, MD5/SHA1 without salt, no stretch
-- JWT issues: `alg:none`, weak secret, missing expiry/signature validation
-- Timing attack: `==` comparison for tokens instead of constant-time compare
-- CSRF: state-changing endpoints (POST/PUT/PATCH/DELETE) without CSRF token validation or `SameSite` cookie attribute; check for anti-CSRF middleware or framework-level protection
-Use **Auth & Session** and **CSRF** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
+### Agent assignments
 
-**Agent D — Crypto, Data Exposure & Misconfiguration:**
-- Weak/broken crypto: MD5/SHA1 for security, DES/3DES/RC4, ECB mode
-- Hardcoded crypto keys, IVs, or nonces
-- Disabled TLS verification: `InsecureSkipVerify`, `verify=False`, `NODE_TLS_REJECT_UNAUTHORIZED=0`
-- Sensitive data in logs: passwords, tokens, PII in log/print statements
-- Permissive CORS: `Access-Control-Allow-Origin: *` combined with credentials
-- Missing security headers: CSP, HSTS, X-Frame-Options, X-Content-Type-Options
-- Debug/dev mode flags enabled in production configs
-Use **Crypto** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
+Each agent uses its corresponding section from pre-loaded `vuln-patterns.md` as the pattern reference. Do NOT repeat patterns already in that file — just apply them.
 
-**Agent E — Input Handling, File Upload & Logic:**
-- Path traversal: user-controlled paths without sanitization (no `basename`, no allowlist)
-- Unsafe deserialization: `pickle.loads`, `yaml.load` without SafeLoader, Java `ObjectInputStream`, `BinaryFormatter`
-- Unvalidated redirects: user-controlled redirect URLs without allowlist
-- ReDoS: catastrophic-backtracking regex patterns applied to user input
-- Integer overflow in security-critical calculations (token expiry, quota checks)
-- Race condition (TOCTOU): check-then-use pattern on files or shared state
-- **File upload**: no file type validation (MIME/magic bytes), no size limit, saving to web-accessible path, using unsanitized original filename, no content validation (SVG XSS, zip bombs). Use **File Upload** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
-Use **Injection** section patterns (path traversal, unsafe deserialization) from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
+| Agent | Scope | vuln-patterns.md section |
+|-------|-------|--------------------------|
+| **A** | Secrets & Credentials (API keys, passwords, tokens, private keys, connection strings, cloud creds) | **Secrets** |
+| **B** | Injection (SQL, OS cmd, XSS, SSTI, LDAP/NoSQL, header injection, SSRF) | **Injection** |
+| **C** | Auth, Authorization & Session (missing auth, IDOR, broken access control, session, JWT, CSRF, timing) | **Auth & Session** + **CSRF** |
+| **D** | Crypto, Data Exposure & Misconfiguration (weak crypto, hardcoded keys, TLS bypass, data in logs, CORS, headers, debug mode) | **Crypto** |
+| **E** | Input Handling, File Upload & Logic (path traversal, deserialization, redirects, ReDoS, overflow, TOCTOU, file upload) | **Injection** (path/deser) + **File Upload** |
+| **F** | Docker & Container Security (Dockerfile, compose, .dockerignore) | **Docker & Container Security** |
+| **G** | API Security (rate limit, over-fetch, pagination, validation, GraphQL, mass assignment) | **API Security** |
 
-**Agent F — Docker & Container Security:**
-Scan `Dockerfile`, `docker-compose.yml`, `.dockerignore` and container-related configs. Use **Docker & Container Security** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
-- Running as root (no `USER` instruction or `USER root`)
-- Unpinned base image tags (`:latest` or no tag)
-- Secrets in `ARG`/`ENV`/`environment:` as literal values
-- `COPY . .` without `.dockerignore` — leaks `.env`, `.git`, secrets
-- `privileged: true`, `network_mode: host`, Docker socket mount
-- No multi-stage build, no `HEALTHCHECK`, unnecessary tools in prod image
-- No resource limits in compose (`mem_limit`, `cpus`)
-
-**Agent G — API Security:**
-Scan route handlers, controllers, middleware for API-specific issues. Use **API Security** section patterns from `vuln-patterns.md` (pre-loaded in context — do not re-read the file).
-- Missing rate limiting on auth/public endpoints
-- Data over-fetching: returning full DB objects without DTO/serializer
-- Missing pagination: unbounded `SELECT *` / `.find({})` without `LIMIT`
-- No request body schema validation (no joi/zod/pydantic/class-validator)
-- GraphQL: introspection enabled in prod, no query depth/complexity limit
-- Sensitive data in URL query params (tokens in GET requests)
-- Bulk endpoints without size limits
-- Mass assignment: accepting arbitrary keys from request body
+**Severity hints** (agents assign preliminary severity; Phase 2 finalizes):
+- Agent A: CRITICAL if live-looking key format, HIGH if generic literal password/token
+- Agent F: read only `Dockerfile*`, `docker-compose*.yml`, `.dockerignore` — skip grep, read files directly (small set)
+- Agent G: focus on route/handler/controller files only
 
 ---
 
 ## Phase 2: Consolidate & Score
 
-After all agents complete:
-1. **Deduplicate** findings that overlap across agents (same file:line)
+> **Start Phase 2 ONLY after all 7 agents report completion.**
+
+1. **Deduplicate** by `file:line + CWE` combination. If same file:line, same CWE from multiple agents: keep highest severity instance.
 2. **Assign final severity** — CRITICAL / HIGH / MEDIUM / LOW / INFO:
    - CRITICAL: directly exploitable, RCE/data breach possible (live secret, unmitigated SQL injection, no auth on admin endpoint)
    - HIGH: exploitable with moderate effort, significant impact (IDOR, weak crypto on sensitive data, SSTI)
@@ -133,7 +94,9 @@ After all agents complete:
 
 ## Phase 3: Generate Report
 
-**When ready to generate**, read all three reference files **simultaneously (in parallel)** — located in the **same directory as this skill file**:
+> **Start Phase 3 ONLY after Phase 2 scoring is complete.** Do NOT re-read `vuln-patterns.md` — CWE IDs are already in findings.
+
+Read all three reference files **simultaneously (in parallel)** — located in the **same directory as this skill file**:
 - `references/styles.css` — paste into `<style>` tag
 - `references/components.md` — HTML component patterns + shared JS
 - `references/report-structure.md` — full section structure

@@ -34,7 +34,8 @@ ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.t
 **1b. Dependency analysis** (parallel agents per subproject):
 - Extract deps + versions from manifests only
 - **Skip** pure dev/tooling deps: `eslint`, `prettier`, `jest`, `mocha`, `@types/*`, `webpack`, `babel`, `typescript`, `husky`, `lint-staged`
-- Web search `"<pkg> latest version"` and `"<pkg> CVE vulnerability"` per significant dep — **cap at 30 deps per subproject**; if more, prioritize: (1) runtime/direct deps, (2) deps with known vulnerability history (e.g. `express`, `axios`, `django`, `spring`), (3) largest version gaps
+- **Cap at 30 deps per subproject**; if more, prioritize: (1) runtime/direct deps, (2) deps with known vulnerability history (e.g. `express`, `axios`, `django`, `spring`), (3) largest version gaps. If tied at position 30, prefer deps with larger version gaps.
+- **Web search strategy**: per dep, do **one combined search** `"<pkg> latest version CVE vulnerability"`. If no CVE found on first result → mark OK and stop. If CVE found → record it. Do NOT perform secondary searches per CVE. **Max 30 web searches per subproject.**
 - Risk levels: CRITICAL (exploit CVE) → HIGH (DoS CVE, deprecated, EOL) → MEDIUM (many versions behind) → LOW (1-2 patches) → OK
 - Generate upgrade commands per package manager:
   - Go: `go get pkg@ver`
@@ -50,27 +51,34 @@ ONLY read: manifests (`go.mod`, `package.json`, `requirements.txt`, `pyproject.t
   - Ruby/Bundler: edit `Gemfile` version then `bundle update pkg`
 
 **1c. Code quality** (parallel agents):
-- **Cap at 40 source files per subproject.** Read in priority order: (1) entry points (`main.*`, `index.*`, `app.*`, `server.*`, `Program.cs`, `Startup.cs`), (2) routers/controllers, (3) auth/security middleware, (4) database/ORM models, (5) utility/helper functions, (6) test files (sample only — 3 max). Stop once 40 files are read.
+- **Cap at 40 source files total per subproject** (including up to 3 test file samples). Read in priority order: (1) entry points (`main.*`, `index.*`, `app.*`, `server.*`, `Program.cs`, `Startup.cs`), (2) routers/controllers, (3) auth/security middleware, (4) database/ORM models, (5) utility/helper functions, (6) test files (sample only — 3 max). Stop once 40 files are read.
+- **Per-file limit**: max 500 lines. For files >500 lines, read only the first 200 + last 100 lines.
+- **Early-exit (architecture only)**: if architecture pattern is clear after 10 files (e.g., MVC, Clean Architecture, monolith), finalize the architecture grade early. **Continue scanning** remaining files (up to 40 cap) for security, performance, and stability issues — do NOT skip these scans.
 - Scan for: architecture, tests, security (secrets, XSS, CORS, injection, unbounded reads, leaks, missing timeouts/shutdown), performance, stability. Grade A+ to F.
 
 **1d. OWASP Top 10 (2025) audit** (parallel agent):
-Read `references/owasp-2025.md` for the full 10-category checklist. Systematically check code against all categories (2025 edition).
-For each category: rate as PASS / WARN / FAIL with evidence (file:line). Generate overall OWASP compliance score (X/10 passed).
+Read `references/owasp-2025.md` for the full 10-category checklist. For each category:
+- **Grep first**: search for relevant patterns (e.g., `sql`, `exec`, `password`, `cors`) before reading files.
+- If **0 grep matches** → mark category as PASS immediately (no files to scan).
+- If grep matches found → scan **all matched files up to 10**. Do NOT early-exit — review every matched file since grep already narrowed to candidates.
+- Rate as PASS / WARN / FAIL with evidence (file:line). Generate overall OWASP compliance score (X/10 passed).
 
 **1e. CI/CD pipeline assessment** (parallel agent):
-Find and read CI/CD config files. Evaluate in two dimensions:
+Find and read CI/CD config files. **If no CI/CD config found** → grade as Beginner maturity, skip both dimensions, report "No CI/CD pipeline detected".
 
-**Dimension 1: CI/CD Pipeline Maturity** — read `references/cicd-maturity.md` for the full 8-area checklist.
+Read both reference files in parallel: `references/cicd-maturity.md` + `references/cicd-sec.md`.
 
-**Dimension 2: OWASP Top 10 CI/CD Security Risks** — security-focused audit based on OWASP CI/CD project:
-Read `references/cicd-sec.md` for the full CICD-SEC-01 to CICD-SEC-10 checklist.
+**Dimension 1: CI/CD Pipeline Maturity** — evaluate against `cicd-maturity.md` 8-area checklist.
+**Dimension 2: OWASP Top 10 CI/CD Security Risks** — evaluate against `cicd-sec.md` CICD-SEC-01 to CICD-SEC-10.
 For each CICD-SEC risk: rate as PASS / WARN / FAIL with evidence. Generate overall CI/CD security score (X/10 passed).
 
 ---
 
 ## Phase 2: Generate Reports
 
-**When ready to generate**, read all three reference files **simultaneously (in parallel)**:
+> **Start Phase 2 ONLY after all Phase 1 agents (1b, 1c, 1d, 1e) report completion.** Do NOT re-read `owasp-2025.md`, `cicd-maturity.md`, or `cicd-sec.md` — their data is already in Phase 1 findings.
+
+Read all three reference files **simultaneously (in parallel)**:
 - `references/styles.css` — paste into `<style>` tag of both reports
 - `references/components.md` — HTML component patterns + shared JS
 - `references/report-structure.md` — full section structure for both reports

@@ -25,12 +25,14 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 ## Step 2: Extract data (single pass, parallel agents)
 
-> **Token efficiency:** Lighthouse HTML files are 2–5 MB of HTML/CSS/JS. Do NOT read the full file.
-> Extract only the embedded JSON data blob:
-> - Search for `window.__LIGHTHOUSE_JSON__` — its value is the full report JSON object
-> - Or look for `<script type="application/json">` near the end of the file
-> - Extract that JSON blob only. Skip all HTML markup, CSS, SVG, and other script tags.
-> - This reduces token cost by **10–50× per file**.
+> **Token efficiency:** Lighthouse HTML files are 2–5 MB. Do NOT read the full file.
+
+**JSON extraction strategy** (per file):
+1. Search for `window.__LIGHTHOUSE_JSON__` in the **last 30% of the file** (JSON blob is near the end). Use offset-based reading — start from 70% of file length.
+2. If not found, search for `<script type="application/json">` in the last 30%.
+3. If neither found in the last 30%, try the **first 50KB** as fallback.
+4. If still not found → **skip the file**, note it as unparseable. Do NOT read the entire file.
+5. Extract only the JSON object. Skip all HTML markup, CSS, SVG, other scripts.
 
 **Batching:** 1–8 files → 1 agent. 9–16 → 2 agents (8 each). 17+ → ceil(N/8) agents, last batch takes the remainder. Each agent reads its assigned files and extracts ALL data in one pass:
 
@@ -52,18 +54,25 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 - Diagnostics — main-thread work, JS execution time, unused JS size, network payload
 
 **File-level detail (same pass):**
-- Unused JS — try `"unused-javascript"` first (Lighthouse ≥ v9); fall back to `"reduce-unused-javascript"` (v8 and earlier): file URL, totalBytes, wastedBytes
-- Unused CSS — `"unused-css-rules"`: file URLs, wasted bytes
-- Render-blocking — `"render-blocking-resources"` items
-- Third-party code — `"third-party-summary"` with transfer sizes
-- Main-thread breakdown — `"mainthread-work-breakdown"` categories
-- LCP element — `"largest-contentful-paint-element"`: DOM element, selector, timing breakdown
-- Layout shift elements — `"layout-shift-elements"`: DOM elements with shift scores
-- DOM size — `"dom-size"`: total elements, max depth, max children
-- Long tasks — `"long-tasks"`: JS files with longest blocking tasks
-- bfcache failures — `"bf-cache"`: failure reasons (actionable vs not)
-- Font display — `"font-display"`: fonts without `font-display: swap`
-- Image optimization — `"modern-image-formats"` / `"uses-optimized-images"`: wasteable bytes
+
+Extract in priority order. **Cap at top 10 items per audit key** (sorted by wastedBytes or impact). If an audit key has no items or score=1, skip it.
+
+| Priority | Audit key | Extract |
+|----------|-----------|---------|
+| **P1 — Core** | `"unused-javascript"` (fallback: `"reduce-unused-javascript"`) | file URL, totalBytes, wastedBytes |
+| **P1** | `"render-blocking-resources"` | items |
+| **P1** | `"largest-contentful-paint-element"` | DOM element, selector, timing |
+| **P2 — Important** | `"unused-css-rules"` | file URLs, wasted bytes |
+| **P2** | `"third-party-summary"` | transfer sizes |
+| **P2** | `"mainthread-work-breakdown"` | categories |
+| **P2** | `"layout-shift-elements"` | DOM elements, shift scores |
+| **P2** | `"bf-cache"` | failure reasons (actionable only) |
+| **P3 — Supplementary** | `"dom-size"` | total elements, max depth, max children |
+| **P3** | `"long-tasks"` | JS files with longest blocking tasks |
+| **P3** | `"font-display"` | fonts without `font-display: swap` |
+| **P3** | `"modern-image-formats"` / `"uses-optimized-images"` | wasteable bytes |
+
+If token budget is tight, extract P1 + P2 only. P3 is optional but provides richer detail.
 
 ## Step 3: Analyze and group
 
@@ -80,7 +89,9 @@ Glob `*.html` in target directory (exclude any existing `lighthouse-summary-repo
 
 ## Step 4: Generate HTML report
 
-**When ready to generate**, read all three reference files **simultaneously (in parallel)** — located in the **same directory as this skill file** (not the report directory):
+> **Start Step 4 ONLY after Step 3 analysis is complete.**
+
+Read all three reference files **simultaneously (in parallel)** — located in the **same directory as this skill file** (not the report directory):
 - `references/styles.css` — paste into `<style>` tag
 - `references/components.md` — HTML component patterns, Chart.js setup, shared JS
 - `references/report-structure.md` — full section structure and code example list
