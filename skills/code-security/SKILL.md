@@ -1,27 +1,30 @@
 ---
 name: code-security
 description: "Deep security audit of source code — bilingual (EN/TH) HTML report with CWE-mapped findings and remediation. Covers: hardcoded secrets, SQL/XSS/OS/template/LDAP injection, broken auth & IDOR, crypto weaknesses, path traversal, insecure deserialization, CORS/header misconfig, sensitive data exposure, ReDoS, Docker/container security, API security, file upload vulnerabilities. Trigger: security audit, vulnerability scan, secret scan, SAST, XSS, SQL injection, security hardening, pen test prep, Docker security, API security."
-argument-hint: "[project-path or leave empty for current directory]"
+argument-hint: "[path1 path2 ... or leave empty for current directory] — space or comma-separated"
 ---
 
 # Code Security Auditor
 
-Perform a deep security audit of source code at `$ARGUMENTS` (default: cwd).
+Perform a deep security audit of source code at one or more paths given in `$ARGUMENTS` (default: cwd).
 Generate one bilingual (EN/TH) HTML report: `security-audit-report.html`.
 
 ## Step 0: Validate input
 
-- If `$ARGUMENTS` is provided, verify the path exists. If not, tell the user and stop.
-- If `$ARGUMENTS` is empty, use cwd.
-- If `security-audit-report.html` already exists, inform user it will be overwritten and proceed.
+**Parse paths:** Split `$ARGUMENTS` by commas or whitespace to get a list of target paths. Trim each path. Deduplicate.
+- If `$ARGUMENTS` is empty, use `[cwd]` as the single-path list.
+- For each path in the list: verify it exists. If any path does not exist, tell the user which paths are invalid and stop.
+- If `security-audit-report.html` already exists in the output location, inform user it will be overwritten and proceed.
+- Store the validated list as **TARGET_PATHS**. All subsequent steps operate over every path in TARGET_PATHS. Treat each path as an independent scan root.
 
-**Monorepo / root-directory detection:** If the resolved path is `.`, `/`, cwd, or a directory with **no manifest at the top level**, scan one level of sub-directories to find project roots:
+**Monorepo / root-directory detection (applied per path):** For each path in TARGET_PATHS — if it is `.`, `/`, cwd, or a directory with **no manifest at the top level**, scan one level of sub-directories to find project roots:
 1. List immediate sub-directories (skip: `.git`, `node_modules`, `vendor`, `dist`, `build`, `out`, `.next`, `.angular`, `coverage`, `__pycache__`).
 2. A sub-directory is a **project root** if it contains any manifest: `go.mod`, `package.json`, `requirements.txt`, `pyproject.toml`, `Cargo.toml`, `pom.xml`, `*.csproj`, `Gemfile`, `Dockerfile`.
 3. If 2+ project roots are found: scan each root independently (prioritize roots with security-sensitive names: api, auth, backend, server).
 4. If only 1 project root is found: treat it as the scan target.
 5. If no project roots found in sub-directories: scan the given path as-is (flat scan).
 6. Tell the user which sub-directories were identified as project roots before starting the scan.
+7. After processing all paths in TARGET_PATHS, merge their project roots into one combined scan list. Label each root with its source path when multiple TARGET_PATHS are given.
 
 ## Files to SKIP (save tokens)
 
@@ -101,7 +104,7 @@ Read all three reference files **simultaneously (in parallel)** — located in t
 - `references/components.md` — HTML component patterns + shared JS
 - `references/report-structure.md` — full section structure
 
-Create `security-audit-report.html` in `$ARGUMENTS` (or cwd).
+Create `security-audit-report.html` in cwd (the working directory where the skill was invoked). When multiple TARGET_PATHS were scanned, include a **Scanned Paths** table at the top of the report listing all paths alongside their detected project roots.
 
 **Conditional sections:**
 - No findings in a category → show green "No issues found" callout, do not skip the section
@@ -121,4 +124,4 @@ Create `security-audit-report.html` in `$ARGUMENTS` (or cwd).
 
 ## Completion
 
-Tell user: output file path, files scanned, finding counts by severity (CRITICAL / HIGH / MEDIUM / LOW / INFO), risk score (X/100), risk level, top 3 most critical findings summary.
+Tell user: output file path, list of scanned paths, files scanned (total and per-path), finding counts by severity (CRITICAL / HIGH / MEDIUM / LOW / INFO), risk score (X/100), risk level, top 3 most critical findings summary.
